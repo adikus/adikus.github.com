@@ -1,0 +1,139 @@
+header {
+	padding-top: 20px;
+}
+
+header .glyphicon{
+	font-size: 48px;
+}
+
+header img{
+	width:64px;
+	bottom: 50px;
+}
+
+
+#level{
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#money{
+	font-size: 20px;
+	font-weight: bold;
+}
+
+#percentage{
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#percentage.is-orange
+{
+	color:#FF6600;
+}
+
+#percentage.is-light-orange
+{
+	color:#FF9900;
+}
+#percentage.is-red
+{
+	color:red;
+}
+#percentage.is-green
+{
+	color:green;
+}
+
+#reputation{
+	font-size: 20px;
+	font-weight: bold;
+}
+
+#dialogue-box{
+	margin-top: 110px;
+}
+
+#dialogue-box2{
+	position: absolute;
+	display: none;
+	margin-top: 200px;
+	width: 100%;
+
+}#wave-timer {
+	margin-top: 150px;	
+	position: absolute;
+	width: 100%;
+}
+
+#wave-timer .timer {
+	font-size: 48px;
+}
+.icon{
+	position: relative;
+	padding-bottom: 20px
+}
+
+.icon .icon-notification{
+	background: #fff;
+	color: #fff;
+	border: 2px solid #fff;
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	top: 2px;
+	left: 108px;
+	border-radius: 15px;
+	line-height: 28px;
+	text-align: center;
+	font-size: 15px;
+	font-weight: bold;
+	background: red;
+}
+
+.employee-container {
+	position: relative;
+	margin-top: 20px;
+	padding-left: 20px;
+}
+
+.employee-container .btn{
+	background: #003366;
+	color: #fff;
+}
+
+
+.employee-container .employee-count{
+	background: #fff;
+	border: 2px solid #000;
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	top: -2px;
+	left: 27px;
+	border-radius: 20px;
+	line-height: 38px;
+	text-align: center;
+	font-size: 17px;
+	font-weight: bold;
+
+}
+
+.employee-container .employee-price{
+	position: absolute;
+	right: 25px;
+	left: 200px;
+	bottom: 0px;
+	font-size: 16px;
+}
+
+.employee-container .employee-description{
+	padding-bottom: 40px;
+	font-size: 12px;
+	right: 20px;
+}
+
+.employee-container .employee-icon img{
+	width: 90px;
+	top: 2px;
+	}
