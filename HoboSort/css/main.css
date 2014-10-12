@@ -1,16 +1,39 @@
+
+/* Padding to ensure header doesn't abruptly start at the top of the page. */
 header {
 	padding-top: 20px;
 }
 
-header .glyphicon{
-	font-size: 48px;
+/*###########################*/
+/* Styles for the static icon panel at the top.
+/*###########################*/
+
+.icon{
+	position: relative;
+	padding-bottom: 20px
 }
 
-header img{
-	width:64px;
-	bottom: 50px;
+.icon .icon-notification{
+	background: #fff;
+	color: #fff;
+	border: 2px solid #fff;
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	top: 2px;
+	left: 108px;
+	border-radius: 15px;
+	line-height: 28px;
+	text-align: center;
+	font-size: 15px;
+	font-weight: bold;
+	background: red;
 }
 
+/*###########################*/
+/* Styles for the top left panel,
+/* containing level and reputation.
+/*###########################*/
 
 #level{
 	font-size: 24px;
@@ -50,46 +73,10 @@ header img{
 	font-weight: bold;
 }
 
-#dialogue-box{
-	margin-top: 110px;
-}
-
-#dialogue-box2{
-	position: absolute;
-	display: none;
-	margin-top: 200px;
-	width: 100%;
-
-}#wave-timer {
-	margin-top: 150px;	
-	position: absolute;
-	width: 100%;
-}
-
-#wave-timer .timer {
-	font-size: 48px;
-}
-.icon{
-	position: relative;
-	padding-bottom: 20px
-}
-
-.icon .icon-notification{
-	background: #fff;
-	color: #fff;
-	border: 2px solid #fff;
-	width: 30px;
-	height: 30px;
-	position: absolute;
-	top: 2px;
-	left: 108px;
-	border-radius: 15px;
-	line-height: 28px;
-	text-align: center;
-	font-size: 15px;
-	font-weight: bold;
-	background: red;
-}
+/*###########################*/
+/* Styles for the right-hand panel,
+/*containing employee details.
+/*###########################*/
 
 .employee-container {
 	position: relative;
@@ -97,11 +84,10 @@ header img{
 	padding-left: 20px;
 }
 
-.employee-container .btn{
-	background: #003366;
-	color: #fff;
+.employee-container .employee-icon img{
+	width: 90px;
+	top: 2px;
 }
-
 
 .employee-container .employee-count{
 	background: #fff;
@@ -119,6 +105,19 @@ header img{
 
 }
 
+.employee-container .employee-description{
+	padding-bottom: 40px;
+	font-size: 12px;
+	right: 20px;
+}
+
+
+.employee-container .btn{
+	background: #003366;
+	color: #fff;
+}
+
+
 .employee-container .employee-price{
 	position: absolute;
 	right: 25px;
@@ -127,13 +126,36 @@ header img{
 	font-size: 16px;
 }
 
-.employee-container .employee-description{
-	padding-bottom: 40px;
-	font-size: 12px;
-	right: 20px;
+
+
+/*###########################*/
+/* Styles for the canvas 
+/* and elements displayed on top of it.
+/*###########################*/
+
+#canvas-container{
+	background: url("../img/exasperated_on_phone.png");
 }
 
-.employee-container .employee-icon img{
-	width: 90px;
-	top: 2px;
-	}
+#dialogue-box{
+	margin-top: 110px;
+	position: absolute;
+	z-index: 5; /* Ensures button is on the topmost layer in order for it to be clicked. */
+}
+
+#game-over-box{
+	position: absolute;
+	display: none;
+	margin-top: 200px;
+	width: 100%;
+
+}#wave-timer {
+	margin-top: 150px;	
+	position: absolute;
+	width: 100%;
+}
+
+#wave-timer .timer {
+	font-size: 48px;
+}
+

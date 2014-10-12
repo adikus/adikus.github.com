@@ -5,7 +5,7 @@ hoboApp.controller('gameController', function($scope){
 
 	$scope.employees = [
 		new Employee(
-			'Napoleon Bonerfarte',
+			'Alvar Acorn',
 			'Good at breaking bones. And phones.',
 			0,
 			1000*1.5,
@@ -13,7 +13,7 @@ hoboApp.controller('gameController', function($scope){
 			"img/employee1.png"
 		),
 		new Employee(
-			'Durria Bananachin', 
+			'Marjory Marbles', 
 			'The Facebook addict.',
 			2,
 			1000,
@@ -21,7 +21,7 @@ hoboApp.controller('gameController', function($scope){
 			"img/employee3.png"
 		),
 		new Employee(
-			'Kazimir Waffles', 
+			'Boris Buffalo', 
 			'Bird brain.',
 			3,
 			1000*0.8,
@@ -42,7 +42,7 @@ hoboApp.controller('gameController', function($scope){
 	game.player = $scope.player;
 	game.employees = $scope.employees;
 	game.ngScope = $scope;
-	$scope.satisfaction = 50;
+	$scope.reputation = 50;
 
 	$scope.icons=[
 		{
@@ -65,28 +65,34 @@ hoboApp.controller('gameController', function($scope){
 			employee.addCount();
 			employee.increasePrice();
 		}
+		$('#button')[0].play();
+		$('#button')[0].fastSeek(0);
 	};
 
 	$scope.getSatisfcationClass = function()
 	{
-		if($scope.satisfaction <= 25)
+		if($scope.reputation <= 25)
 			return "is-red";
-		if($scope.satisfaction <= 50)
+		if($scope.reputation <= 50)
 			return "is-orange";
-		if($scope.satisfaction <= 75)
+		if($scope.reputation <= 75)
 			return "is-light-orange";
 
 		return "is-green";
 	}
 	$scope.startGame=function(){
+
 		$("#dialogue-box").fadeOut();
-		game.running=true;
+		game.running = true;
+		$scope.gameRunning = true;
 		game.ticker.run();
 		initWave();
+		$('#button')[0].play();
+		$('#button')[0].fastSeek(0);
 	}
 
 	$scope.displayWaveTimer = function() {
-		return game.nextWaveAt && (new Date()).getTime() < game.nextWaveAt.getTime() && game.running;
+		return game.nextWaveAt && (new Date()).getTime() < game.nextWaveAt.getTime() && $scope.gameRunning;
 	}
 
 	$scope.waveTimer = 0; 

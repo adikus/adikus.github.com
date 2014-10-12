@@ -1,44 +1,63 @@
 <!doctype html>
 <html class="no-js" lang="">
+
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>HoboSort. The Game.</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!--Load bootstrap link and main stylesheet.-->
+        <!--##### Load bootstrap link and main stylesheet. #####-->
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/main.css">
-
+        
+        <!--##### Load scripts #### -->
         <script src="js/jquery.js"></script>
         <script src="js/angular.js"></script>
         <script src="js/sprite.js"></script>
-        <script src="js/player_bucket_employee.js"></script>
-        <script src="js/main.js"></script>
+        <script src="js/objects.js"></script>
+        <script src="js/game.js"></script>
         <script src="js/app.js"></script>
+
+        <!--##### Load audio files #### -->
         <audio id="nooo" src ="sound/nooo.mp3" preload="auto"></audio>
+        <audio id="cash" src ="sound/CashRegister.mp3" preload="auto"></audio>
+        <audio id="button" src ="sound/button.mp3" preload="auto"></audio>
+
+        <!--##### Title #### -->
+        <title>HoboSort. The Game.</title>
+
     </head>
+
     <body ng-app="hoboApp" ng-controller="gameController">
+
+        <!--##### Container for top icon panel and top-right leve+reputation pnael #### -->
         <div class="container">
             <header class="text-center">
                 <div class="row">
                     <div class="col-md-8">
                         <div class="row">
+
+                            <!--##### Generate icons #### -->
                             <div class="col-md-3 icon" ng-repeat="(i, icon) in icons">
                                 <img ng-src="{{icon.src}}"/>
                                 <div class="icon-notification">{{customerNumbers[i]}}</div>
                             </div>
+
                         </div>
                     </div>
                     <div class = "col-md-4">
+
+                        <!--##### Display player level and cash #### -->
                         <div class="col-md-4">
                             <div id="level">Level {{player.level}}</div>
                             <div id="money">${{player.cash}}</div>
                         </div>
+
+                        <!--##### Display reputation percentage #### -->
                         <div class= "col-md-4">
-                            <div id="percentage" ng-class="getSatisfcationClass()">{{satisfaction}}%</div>
-                            <div id="reputation">Reputation</div
+                            <div id="percentage" ng-class="getSatisfcationClass()">{{reputation}}%</div>
+                            <div id="reputation">Reputation</div>
                         </div>
                         
                     </div>
@@ -46,25 +65,35 @@
                 </div>
                 
             </header>
+
+            <!--##### Container for canvas and right-hand employee panel #### -->
             <div class="row">
-                
                 <div class="col-md-8" id="canvas-container">
+
+                    <!--##### Display wave timer #### -->
                     <div id="wave-timer" ng-show="displayWaveTimer()" class="text-center">
                         <h2>Time to next wave:</h2>
                         <div class="timer">{{waveTimer}} s</div>
                     </div>
+
+                    <!--##### Display splash screen dialogue box #### -->
                     <div id="dialogue-box" class="text-center">
                         <h2>Welcome to HoboSort.</h2>
                         <p>Due to staff shortages, you're now in charge of dealing with customer enquiries and complaints. All of them. On all communication channels. You're allowed to hire helpers, but ultimately, if a call, email, tweet or comment is left unanswered... it's your reputation that'll suffer! </p>
                         <p>For each customer that connects, you should press the appropriate button to resolve their issue at the moment your icons overlap... or you can leave it to your imps. But they won't be 100% efficient all of the time. That, and they're not very sentient. Thus it's up to you to prioritse. Customers in green are heavy spenders. Customers in red will leave nasty reviews on your website if ignored. Choose wisely.</p>
                         <a class="btn btn-success btn-lg" ng-click="startGame()">Start game!</a>
                     </div>
-                    <div id="dialogue-box2" class="text-center">
+
+                    <!--##### Display game over dialogue box #### -->
+                    <div id="game-over-box" class="text-center">
                         <h2>Game Over!</h2>
                         <p>Your reputation dropped below 0!</p>
                     </div>
+
                 </div>
                 <div class="col-md-4">
+
+                    <!--##### Generate employees in panel #### -->
                     <div class="employee-container row" ng-repeat="employee in employees">
                         <div class="employee-icon col-xs-4">
                             <img ng-src="{{employee.img}}"/>
