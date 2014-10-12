@@ -95,6 +95,7 @@ function loseGame() {
     propagateGameRunning();
 
     $('#nooo')[0].play();
+    $('#theme')[0].pause();
     $("#game-over-box").fadeIn();
     var customer;
     while(customer = game.customerSprites.iterate()){
@@ -215,7 +216,7 @@ function checkBucketCollisions() {
 function customerSuccess(customerSprite) {
 
     $('#cash')[0].play();
-    $('#cash')[0].fastSeek(0);
+    if($('#cash')[0].fastSeek)$('#cash')[0].fastSeek(0);
     addReputation();
     game.player.addCash(game.values[customerSprite.id].reward);
     propagateCash();
