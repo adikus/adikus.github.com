@@ -10,23 +10,8 @@ hoboApp.controller('gameController', function($scope){
 			0,
 			1000*1.5,
 			0,
-			"img/employee1.png"
-		),
-		new Employee(
-			'Marjory Marbles', 
-			'The Facebook addict.',
-			2,
-			1000,
-			0,
-			"img/employee3.png"
-		),
-		new Employee(
-			'Boris Buffalo', 
-			'Bird brain.',
-			3,
-			1000*0.8,
-			0,
-			"img/employee2.png"
+			"img/employee1.png",
+			"img/hk1.png"
 		),
 		new Employee(
 			'Nigel Nybbles', 
@@ -34,8 +19,28 @@ hoboApp.controller('gameController', function($scope){
 			1,
 			1000*1.2,
 			0,
-			"img/employee4.png"
+			"img/employee4.png",
+			"img/hk2.png"
+		),
+		new Employee(
+			'Marjory Marbles', 
+			'The Facebook addict.',
+			2,
+			1000,
+			0,
+			"img/employee3.png",
+			"img/hk3.png"
+		),
+		new Employee(
+			'Boris Buffalo', 
+			'Bird brain.',
+			3,
+			1000*0.8,
+			0,
+			"img/employee2.png",
+			"img/hk4.png"
 		)
+		
 	];
 
 	$scope.player = new Player(0,10000);

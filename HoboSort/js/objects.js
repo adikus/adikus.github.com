@@ -1,10 +1,11 @@
-function Employee(name, desc, type, price, count, img) {
+function Employee(name, desc, type, price, count, img, hotkey) {
 	this.name = name;
 	this.count = count;
 	this.type = type;
 	this.price = price;
 	this.img = img;
 	this.desc = desc;
+	this.hotkey = hotkey;
 }
 
 Employee.prototype.addCount = function(){

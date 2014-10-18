@@ -105,6 +105,13 @@ header {
 
 }
 
+.employee-container .employee-hotkey{
+	position: absolute;
+	right: 8px;
+	top: -10px;
+	z-index: 5;
+}
+
 .employee-container .employee-description{
 	padding-bottom: 40px;
 	font-size: 12px;
