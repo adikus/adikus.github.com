@@ -107,7 +107,8 @@ function Customer()
 		    this.sprite  = game.scene.Sprite(this.image(this.type, this.mood), game.layer);
 		    this.sprite.move(game.positions[this.type], -game.imageWidth);
 		    this.sprite.size(game.imageWidth, game.imageWidth);
-		    this.sprite.yv = 3 * game.player.level * this.speeds[this.mood];
+		    this.sprite.yv = 3 + 2*Math.log(game.player.level); // 3(L1) -> ~10(L10)
+		    this.sprite.yv *= this.speeds[this.mood];
 		    this.sprite.update();
 		},
 

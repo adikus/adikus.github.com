@@ -1,6 +1,6 @@
 game = {
     types: ["phone","mail","facebook","twit"], 
-    values: {}, 
+    values: {},
     wave: [], 
     customerNumbers: [0,0,0,0],
     running: false, 
@@ -13,7 +13,8 @@ game = {
     reputation: 50,
     buttonStates: [1,1,1,1],
     buckets: [],
-    waveBreak: 8000
+    waveBreak: 8000,
+    waveNumbers: [15, 20, 30, 40, 55, 70, 85, 100]
 };
 
 //Generates customers
@@ -36,11 +37,17 @@ function showCustomer() {
 
 function initWave() {
     game.nextWaveAt = new Date();
-    game.waveNumbers = [15, 30, 75, 150, 300, 750, 1500, 3000];
     game.nextWaveAt.setTime(game.nextWaveAt.getTime() + game.waveBreak);
 
     game.player.levelUp();
-    for(var i = 0; i < game.waveNumbers[game.player.level-1]; i++) {
+    var customerCount;
+    if(game.waveNumbers[game.player.level-1]){
+        customerCount = game.waveNumbers[game.player.level-1]; // as specified in array
+    } else {
+        customerCount = game.waveNumbers[game.waveNumbers.length-1]+(20*(game.player.level - game.waveNumbers.length)); // + 20 for each level > L8
+    } 
+        
+    for(var i = 0; i < customerCount; i++) {
         addCustomer();   
     }
     setTimeout(function(){propagateCustomerNumbers();},10);
@@ -165,7 +172,8 @@ function draw() {
 }
 
 function spawnCustomer() {
-    if (game.tickCounter % Math.round(50/game.player.level) == 0 && game.nextWaveAt && (new Date()).getTime() > game.nextWaveAt.getTime()){
+    var frequency = 20 + 35*Math.log(game.player.level); // Spawns per 1000 ticks (~20(L1) -> ~100(L10))
+    if (game.tickCounter % Math.round(1000/frequency) == 0 && game.nextWaveAt && (new Date()).getTime() > game.nextWaveAt.getTime()){
         showCustomer();
     }
 
