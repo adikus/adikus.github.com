@@ -1,0 +1,12 @@
+{"frames": [
+
+  {
+    "filename": "cube",
+    "frame": {"x":0,"y":0,"w":70,"h":74},
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": {"x":0,"y":0,"w":70,"h":74},
+    "sourceSize": {"w":70,"h":74}
+  }
+
+]}
