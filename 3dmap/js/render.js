@@ -1,4 +1,4 @@
-VERSION = '0.1.2-a';
+VERSION = '0.1.2-b';
 
 var game;
 var isoGroup;
@@ -8,6 +8,7 @@ var polygonCounts;
 
 var scaleDown = 3;
 var size = 40/scaleDown;
+var sprite;
 
 var previousPointerPosition;
 
@@ -32,6 +33,8 @@ function zoom(scale) {
 
     game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
     game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
+
+    game.world.setBounds(sprite.x*zoom, sprite.y*zoom, sprite.width*zoom, sprite.height*zoom);
 }
 
 function create() {
@@ -61,6 +64,8 @@ function create() {
         drawTile(key, (i++)*80, 100);
     });
 
+    console.log((new Date()).getTime() - startTime, 'Tileset created.');
+
     _(polygons).each(function(poly) {
         var x = poly.i*size;
         var y = poly.j*size;
@@ -77,16 +82,19 @@ function create() {
 
     game.iso.simpleSort(isoGroup);
 
+    console.log((new Date()).getTime() - startTime, 'Tilemap constructed.');
+
     // draw graphics to renderTexture
     var renderTexture = game.add.renderTexture(isoGroup.width, isoGroup.height);
     renderTexture.renderXY(isoGroup, -isoGroup.getBounds().x, -isoGroup.getBounds().y, true);
 
-    var sprite = this.game.add.sprite(0, 0);
+    sprite = this.game.add.sprite(0, 0);
     sprite.texture = renderTexture;
+    console.log((new Date()).getTime() - startTime, 'Tilemap rendered into texture.');
+
     var bounds = sprite.getBounds();
-    console.log(bounds.centerX, bounds.centerY);
     game.camera.focusOnXY(bounds.centerX, bounds.centerY);
-    console.log(game.camera.view);
+    game.world.setBounds(sprite.x, sprite.y, sprite.width, sprite.height);
 
     //renderTexture.destroy();
     //isoGroup.destroy();
@@ -119,16 +127,16 @@ function drawTile(key, x, y) {
 
 function update() {
     if (cursors.up.isDown){
-        game.camera.y -= 4;
+        game.camera.y -= 20;
     }
     if (cursors.down.isDown){
-        game.camera.y += 4;
+        game.camera.y += 20;
     }
     if (cursors.right.isDown){
-        game.camera.x += 4;
+        game.camera.x += 20;
     }
     if (cursors.left.isDown){
-        game.camera.x -= 4;
+        game.camera.x -= 20;
     }
 
     if(game.input.activePointer.isDown && !game.input.pointer2.isDown){
@@ -167,15 +175,19 @@ function createPolygons() {
     });
 }
 
+var startTime = (new Date()).getTime();
+
 $(function () {
     $('#version').text(VERSION);
 
+    console.log((new Date()).getTime() - startTime, 'Map generation started.');
     window.map = new Map(241,241, 24, '1234567');
     window.detailMap = new Map(241,241, 4, 'abcdefg');;
     map.normalize(8);
     detailMap.normalize(100);
 
     createPolygons();
+    console.log((new Date()).getTime() - startTime, 'Map generation completed.');
 
     game = new Phaser.Game($('#render').innerWidth(), window.innerHeight - 50, Phaser.CANVAS, 'render', { preload: preload, create: create, render: render, update: update});
 });
