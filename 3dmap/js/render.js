@@ -19,6 +19,18 @@ function preload() {
     game.iso.anchor.setTo(0, 0);
 }
 
+function zoom(scale) {
+    var x = (game.camera.view.x + game.camera.view.halfWidth)/game.camera.scale.x;
+    var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
+
+    var s = game.camera.scale.x;
+    var zoom = Phaser.Math.clamp(s*scale, 0.1, 2);
+
+    console.log(zoom);
+    game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
+    game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
+}
+
 function create() {
     game.world.setBounds(-10000, -10000, 20000, 20000);
 
@@ -26,23 +38,18 @@ function create() {
 
     cursors = game.input.keyboard.createCursorKeys();
     game.input.mouse.mouseWheelCallback = function(event) {
-        var x = (game.camera.view.x + game.camera.view.halfWidth)/game.camera.scale.x;
-        var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
-
-        var s = game.camera.scale.x;
         if(event.wheelDelta > 0){
-            var zoom = Phaser.Math.clamp(s*1.05, 0.1, 2);
-            game.camera.scale.setTo(zoom);
+            zoom(1.05);
         }else{
-            var zoom = Phaser.Math.clamp(s/1.05, 0.1, 2);
-            game.camera.scale.setTo(zoom);
+            zoom(1/1.05);
         }
-        console.log(zoom);
-        game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
-        game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
 
         event.preventDefault();
     };
+
+    Hammer($('#render')[0]).on("pinch", function (event) {
+        zoom(event.gesture.scale);
+    });
 
     //isoGroup = game.add.group();
     isoGroup = new Phaser.Group(game, null);
