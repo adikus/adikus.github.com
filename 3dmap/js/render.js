@@ -7,6 +7,8 @@ var polygonCounts;
 var scaleDown = 3;
 var size = 40/scaleDown;
 
+var previousPointerPosition;
+
 function preload() {
     game.load.image('cube', 'assets/cube.png');
 
@@ -23,6 +25,24 @@ function create() {
     game.time.advancedTiming = true;
 
     cursors = game.input.keyboard.createCursorKeys();
+    game.input.mouse.mouseWheelCallback = function(event) {
+        var x = (game.camera.view.x + game.camera.view.halfWidth)/game.camera.scale.x;
+        var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
+
+        var s = game.camera.scale.x;
+        if(event.wheelDelta > 0){
+            var zoom = Phaser.Math.clamp(s*1.05, 0.1, 2);
+            game.camera.scale.setTo(zoom);
+        }else{
+            var zoom = Phaser.Math.clamp(s/1.05, 0.1, 2);
+            game.camera.scale.setTo(zoom);
+        }
+        console.log(zoom);
+        game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
+        game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
+
+        event.preventDefault();
+    };
 
     //isoGroup = game.add.group();
     isoGroup = new Phaser.Group(game, null);
@@ -71,15 +91,21 @@ function create() {
 
     var sprite = this.game.add.sprite(0, 0);
     sprite.texture = renderTexture;
+    var bounds = sprite.getBounds();
+    console.log(bounds.centerX, bounds.centerY);
+    //game.camera.focusOnXY(bounds.centerX, bounds.centerY);
+    console.log(game.camera.view);
 
     //renderTexture.destroy();
     //isoGroup.destroy();
+
+    game.add.sprite(0,0,'cube');
 }
 
 var textures = {};
 
 function drawTile(key, x, y) {
-    var graphics = new Phaser.Graphics(game, x, y)
+    var graphics = new Phaser.Graphics(game, x, y);
     //var graphics = game.add.graphics(x, y);
     var polygon = polygonCounts[key].poly;
     polygon.isoRotate();
@@ -113,6 +139,17 @@ function update() {
     if (cursors.left.isDown){
         game.camera.x -= 4;
     }
+
+    if(game.input.activePointer.isDown && !game.input.pointer2.isDown){
+        if (previousPointerPosition) {
+            game.camera.x += previousPointerPosition.x - game.input.activePointer.position.x;
+            game.camera.y += previousPointerPosition.y - game.input.activePointer.position.y;
+        }
+        previousPointerPosition = game.input.activePointer.position.clone();
+    }else{
+        previousPointerPosition = null;
+    }
+
 }
 
 function render() {
