@@ -1,4 +1,4 @@
-VERSION = '0.1.2-b';
+VERSION = '0.1.2-c';
 
 var game;
 var isoGroup;
@@ -100,6 +100,16 @@ function create() {
     //isoGroup.destroy();
 
     game.add.sprite(0,0,'cube');
+
+    game.scale.fullScreenScaleMode = Phaser.ScaleManager.RESIZE;
+
+    $('#fullscreen').click(function() {
+        if (game.scale.isFullScreen) {
+            game.scale.stopFullScreen();
+        } else {
+            game.scale.startFullScreen(true);
+        }
+    });
 }
 
 var textures = {};
