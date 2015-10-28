@@ -184,5 +184,5 @@ $(function () {
 
     createPolygons();
 
-    game = new Phaser.Game($('#render').innerWidth(), 800, Phaser.CANVAS, 'render', { preload: preload, create: create, render: render, update: update});
+    game = new Phaser.Game($('#render').innerWidth(), window.innerHeight - 50, Phaser.CANVAS, 'render', { preload: preload, create: create, render: render, update: update});
 });
