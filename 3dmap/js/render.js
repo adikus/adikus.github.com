@@ -1,4 +1,4 @@
-VERSION = '0.1.2';
+VERSION = '0.1.2-a';
 
 var game;
 var isoGroup;
@@ -35,6 +35,10 @@ function zoom(scale) {
 }
 
 function create() {
+    Hammer($('#render')[0]).on("pinch", function (event) {
+        zoom(event.gesture.scale);
+    });
+
     game.world.setBounds(-10000, -10000, 20000, 20000);
 
     game.time.advancedTiming = true;
@@ -49,10 +53,6 @@ function create() {
 
         event.preventDefault();
     };
-
-    Hammer($('#render')[0]).on("pinch", function (event) {
-        zoom(event.gesture.scale);
-    });
 
     isoGroup = new Phaser.Group(game, null);
 
