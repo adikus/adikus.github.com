@@ -1,3 +1,5 @@
+VERSION = '0.1.2';
+
 var game;
 var isoGroup;
 var cursors;
@@ -26,7 +28,8 @@ function zoom(scale) {
     var s = game.camera.scale.x;
     var zoom = Phaser.Math.clamp(s*scale, 0.1, 2);
 
-    console.log(zoom);
+    game.camera.scale.setTo(zoom);
+
     game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
     game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
 }
@@ -51,21 +54,7 @@ function create() {
         zoom(event.gesture.scale);
     });
 
-    //isoGroup = game.add.group();
     isoGroup = new Phaser.Group(game, null);
-    //map.forEach(function (v, i, j) {
-    //    var x = i*size;
-    //    var y = j*size;
-    //    var z = (v + detailMap.get(i, j))*size/2;
-    //
-    //    var cube = game.add.isoSprite(x, y, z, 'cube', 0, isoGroup);
-    //
-    //    cube.scale.x = 1/scaleDown;
-    //    cube.scale.y = 1/scaleDown;
-    //    //cube.inputEnabled = true;
-    //    cube.autoCull = true;
-    //    cube.anchor.set(0.5);
-    //});
 
     var i = 1;
     _(polygonCounts).chain().keys().sort().each(function(key) {
@@ -76,17 +65,13 @@ function create() {
         var x = poly.i*size;
         var y = poly.j*size;
         var z = poly.z*size/2;
-        //var z = 0;
 
         var cube = game.add.isoSprite(x, y, z, null, 0, isoGroup);
-        //var cube = new Phaser.Plugin.Isometric.IsoSprite(game, x, y, z, null, 0);
 
         cube.texture = textures[poly.getType()];
-        //cube.texture = textures['0000'];
         cube.scale.x = 1/scaleDown;
         cube.scale.y = 1/scaleDown;
         //cube.inputEnabled = true;
-        cube.autoCull = true;
         cube.anchor.set(0.5);
     });
 
@@ -100,7 +85,7 @@ function create() {
     sprite.texture = renderTexture;
     var bounds = sprite.getBounds();
     console.log(bounds.centerX, bounds.centerY);
-    //game.camera.focusOnXY(bounds.centerX, bounds.centerY);
+    game.camera.focusOnXY(bounds.centerX, bounds.centerY);
     console.log(game.camera.view);
 
     //renderTexture.destroy();
@@ -113,7 +98,6 @@ var textures = {};
 
 function drawTile(key, x, y) {
     var graphics = new Phaser.Graphics(game, x, y);
-    //var graphics = game.add.graphics(x, y);
     var polygon = polygonCounts[key].poly;
     polygon.isoRotate();
     var color = 0.90*polygon.color+0.10;
@@ -184,6 +168,8 @@ function createPolygons() {
 }
 
 $(function () {
+    $('#version').text(VERSION);
+
     window.map = new Map(241,241, 24, '1234567');
     window.detailMap = new Map(241,241, 4, 'abcdefg');;
     map.normalize(8);
