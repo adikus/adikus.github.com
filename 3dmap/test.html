@@ -23,11 +23,15 @@
     </div>
     <script>
       $(function(){
-        $('#test').text('Here');
+        $('#test').text('Here v2');
 
         var mc = new Hammer($('#test')[0]);
         mc.on("pinch", function(event) {
           $('#test').text(event.gesture.scale);
+        });
+
+        mc.on("panleft panright tap press", function(ev) {
+          document.getElementById('test').textContent = ev.type +" gesture detected.";
         });
       });
     </script>
