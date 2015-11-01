@@ -1,4 +1,4 @@
-VERSION = '0.1.3-a';
+VERSION = '0.1.3-b';
 
 var game;
 var isoGroup;
@@ -13,6 +13,7 @@ var previousPointerPosition;
 var renderedChunks = [];
 
 var cube;
+var selectedPoly;
 
 function preload() {
     game.load.image('cube', 'assets/cube.png');
@@ -141,6 +142,7 @@ function update() {
             cube.isoX = Math.floor(point3.x/40)*40;
             cube.isoY = Math.floor(point3.y/40)*40;
             cube.isoZ = polygon.z*20;
+            selectedPoly = polygon;
             break;
         }
     }
@@ -155,6 +157,9 @@ function render() {
     game.debug.text(pos, 2, 45, "#a7aebe");
     var pos2 = Math.round(cube.isoX/40) + ", " + Math.round(cube.isoY/40) + ", " + Math.round(cube.isoZ/20);
     game.debug.text(pos2, 2, 60, "#a7aebe");
+    if(selectedPoly){
+        game.debug.text(selectedPoly.getType(), 2, 75, "#a7aebe");
+    }
 }
 
 $(function () {

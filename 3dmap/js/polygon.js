@@ -5,14 +5,16 @@ Polygon = function(p1, p2, p3, p4) {
         j: p1.elements[1],
         points: [p1, p2, p3, p4],
 
-        initSylvester: function() {
-            this.plane1 = $P(p1, p2, p3);
-            this.plane2 = $P(p1, p3, p4);
-            this.color = this.getColor(this.plane1.normal);
-            this.color2 = this.getColor(this.plane2.normal);
-
+        init: function(){
             this.z = _(this.getValues()).min();
             this.top = _(this.getValues()).max();
+        },
+
+        initSylvester: function() {
+            this.plane1 = p2.elements[2] == p4.elements[2] ? $P(p4, p1, p2) : $P(p1, p2, p3);
+            this.plane2 = p2.elements[2] == p4.elements[2] ? $P(p4, p2, p3) : $P(p1, p3, p4);
+            this.color = this.getColor(this.plane1.normal);
+            this.color2 = this.getColor(this.plane2.normal);
         },
 
         getColor: function(normal) {
@@ -30,7 +32,7 @@ Polygon = function(p1, p2, p3, p4) {
         }
     };
 
-    poly.initSylvester();
+    poly.init();
 
     return poly;
 };
