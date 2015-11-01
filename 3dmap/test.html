@@ -12,36 +12,14 @@
     </div>
     <script>
       $(function(){
-        $('#test').text('Here v5');
+        $('#test').text('Here v6');
 
-        var myElement = document.getElementById('test');
-
-        var mc = new Hammer.Manager(myElement);
-
+        var mc = new Hammer($('#test')[0]);
         var pinch = new Hammer.Pinch();
-        var rotate = new Hammer.Rotate();
-
-        pinch.recognizeWith(rotate);
-
-        mc.add([pinch, rotate]);
-
-        mc.on("pinch rotate", function(event) {
-          $('#test').text(event.gesture.scale);
-          //myElement.textContent += ev.type +" ";
+        mc.add([pinch]);
+        mc.on("pinch", function(event) {
+          $('#test').text(event.scale);
         });
-
-//        $('#test').text('Here v3');
-//
-//        var mc = new Hammer($('#test')[0]);
-//        var pinch = new Hammer.Pinch();
-//        mc.add([pinch]);
-//        mc.on("pinch", function(event) {
-//          $('#test').text(event.gesture.scale);
-//        });
-//
-//        mc.on("panleft panright tap press", function(ev) {
-//          document.getElementById('test').textContent = ev.type +" gesture detected.";
-//        });
       });
     </script>
    </body>
