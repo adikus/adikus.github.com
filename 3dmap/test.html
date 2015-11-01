@@ -12,11 +12,11 @@
     </div>
     <script>
       $(function(){
-        $('#test').text('Here v6');
+        $('#test').text('Here v7');
 
         var mc = new Hammer($('#test')[0]);
-        var pinch = new Hammer.Pinch();
-        mc.add([pinch]);
+//        var pinch = new Hammer.Pinch();
+//        mc.add([pinch]);
         mc.on("pinch", function(event) {
           $('#test').text(event.scale);
         });
