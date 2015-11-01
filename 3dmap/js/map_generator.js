@@ -82,7 +82,7 @@ MapGenerator.prototype = {
             this._interpolateRow(layer, j, x1, x2, layer.size);
         }
 
-        console.log('Interpolated', layer.size, x1/layer.size, x2/layer.size, y1/layer.size, y2/layer.size)
+        //console.log('Interpolated', layer.size, x1/layer.size, x2/layer.size, y1/layer.size, y2/layer.size)
     },
 
     _interpolate: function(layer, x1, y1, x2, y2, steps) {

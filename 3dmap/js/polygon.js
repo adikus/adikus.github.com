@@ -20,7 +20,7 @@ Polygon = function(p1, p2, p3, p4) {
         getColor: function(normal) {
             var color = Math.min(Math.abs(light.dot(normal)/2),1);
             color = 0.90*color+0.10;
-            return Phaser.Color.getColor(0.2*255*color,255*color,0.5*255*color);
+            return Phaser.Color.getColor(255*color,255*color,255*color);
         },
 
         getValues: function() { return _(this.points).map(function(p) { return p.elements[2]; }); },

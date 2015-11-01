@@ -43,11 +43,9 @@ Chunk.prototype = {
                     points[i][j] += this.mapGenerator.get(layer, x, y) / layer.scale;
                 }, this);
 
-                points[i][j] = $V([i, j, Math.round(points[i][j]) - 100]);
+                points[i][j] = $V([i, j, Math.round(points[i][j]) - 80]);
             }
         }
-
-        console.log(points);
 
         this.forEachCoord(function(i, j) {
             var polygon = new Polygon(points[i][j], points[i + 1][j], points[i + 1][j + 1], points[i][j + 1]);
@@ -67,6 +65,12 @@ Chunk.prototype = {
             var polygon = this._polygons[i][j];
             var type = polygon.getType();
 
+            if(polygon.top < 0){
+                type = '0000';
+            }else if(polygon.top >= 0 && polygon.z < -1){
+                type = _(4).times(function(i){ return Math.max(parseInt(type.charAt(i)) + polygon.z + 1, 0); }).join('');
+            }
+
             var texture = tileset.get(type);
             if(!texture){
                 texture = tileset.render(polygon);
@@ -74,9 +78,14 @@ Chunk.prototype = {
 
             var x = polygon.i*40;
             var y = polygon.j*40;
-            var z = polygon.z*20;
+            var z = polygon.z < 0 ? -20 : polygon.z*20;
 
             var tile = game.add.isoSprite(x, y, z, null, 0, this._group);
+
+            if(polygon.z < 20)texture = tileset.get(type+'brown');
+            if(polygon.z < 15)texture = tileset.get(type+'green');
+            if(polygon.z < 3)texture = tileset.get(type+'sand');
+            if(polygon.top < 0)texture = tileset.get(type+'blue');
 
             tile.texture = texture;
             tile.anchor.set(0.5);
@@ -95,6 +104,8 @@ Chunk.prototype = {
 
         var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * 40, this._y * this._size * 40, 0);
         var position = game.iso.project(anchor);
+
+        this._group.destroy();
 
         this._sprite = game.add.sprite(position.x, position.y, null, null, isoGroup);
         this._sprite.anchor.set(-localBounds.x/localBounds.width, -localBounds.y/localBounds.height);

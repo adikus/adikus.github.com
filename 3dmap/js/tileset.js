@@ -46,6 +46,27 @@ Tileset.prototype = {
         var renderTexture = game.add.renderTexture(200, 200);
         renderTexture.renderXY(graphics, 100, 100, true);
         this._textures[polygon.getType()] = renderTexture;
+
+        graphics.tint = Phaser.Color.getColor(22, 115, 14);
+        var renderTextureGreen = game.add.renderTexture(200, 200);
+        renderTextureGreen.renderXY(graphics, 100, 100, true);
+        this._textures[polygon.getType()+'green'] = renderTextureGreen;
+
+        graphics.tint = Phaser.Color.getColor(138, 100, 59);
+        var renderTextureBrown = game.add.renderTexture(200, 200);
+        renderTextureBrown.renderXY(graphics, 100, 100, true);
+        this._textures[polygon.getType()+'brown'] = renderTextureBrown;
+
+        graphics.tint = Phaser.Color.getColor(14, 37, 110);
+        var renderTextureBlue = game.add.renderTexture(200, 200);
+        renderTextureBlue.renderXY(graphics, 100, 100, true);
+        this._textures[polygon.getType()+'blue'] = renderTextureBlue;
+
+        graphics.tint = Phaser.Color.getColor(214, 199, 84);
+        var renderTextureSand = game.add.renderTexture(200, 200);
+        renderTextureSand.renderXY(graphics, 100, 100, true);
+        this._textures[polygon.getType()+'sand'] = renderTextureSand;
+
         this._polygons[polygon.getType()] = polygon;
         graphics.visible = false;
         console.log('Rendered', polygon.getType());
@@ -70,7 +91,5 @@ Tileset.prototype = {
                 this.projector[j][i] = this.game.iso.project(point3);
             }
         }
-
-        console.log(this.projector);
     }
 };

@@ -1,4 +1,4 @@
-VERSION = '0.1.3-f';
+VERSION = '0.1.4';
 
 var game;
 var isoGroup;
