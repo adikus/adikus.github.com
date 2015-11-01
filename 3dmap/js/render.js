@@ -1,4 +1,4 @@
-VERSION = '0.1.3-d';
+VERSION = '0.1.3-e';
 
 var game;
 var isoGroup;
@@ -14,6 +14,8 @@ var renderedChunks = [];
 
 var cube;
 var selectedPoly;
+
+var zoomOnPinchStart;
 
 function preload() {
     game.load.image('cube', 'assets/cube.png');
@@ -58,8 +60,11 @@ function create() {
     var mc = new Hammer($('#render')[0]);
     var pinch = new Hammer.Pinch();
     mc.add([pinch]);
+    mc.on("pinchstart", function() {
+        zoomOnPinchStart = game.camera.scale.x;
+    });
     mc.on("pinch", function(event) {
-        zoom(event.scale);
+        zoom(event.scale / game.camera.scale.x * zoomOnPinchStart);
     });
 
     window.light = $V([0,0.5,1]);
