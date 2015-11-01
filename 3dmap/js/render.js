@@ -1,4 +1,4 @@
-VERSION = '0.1.3';
+VERSION = '0.1.3-a';
 
 var game;
 var isoGroup;
@@ -36,7 +36,8 @@ function zoom(scale) {
     game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
     game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
 
-    //game.world.setBounds(isoGroup.x*zoom, isoGroup.y*zoom, isoGroup.width*zoom, isoGroup.height*zoom);
+    var bounds = isoGroup.getLocalBounds();
+    game.world.setBounds(bounds.x*zoom, bounds.y*zoom, bounds.width*zoom, bounds.height*zoom);
 }
 
 function create() {
