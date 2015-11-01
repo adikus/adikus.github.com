@@ -53,6 +53,20 @@ function create() {
         event.preventDefault();
     };
 
+    window.light = $V([0,0.5,1]);
+
+    window.map = new Map(25, game.device.desktop ? 10 : 3, '123456789');
+    map.generator.addLayer(125, 3);
+    map.generator.addLayer(25, 8);
+    map.generator.addLayer(5, 100);
+
+    window.tileset = new Tileset(game);
+
+    map.forEachChunkCoord(function(i, j){
+        if(!renderedChunks[i])renderedChunks[i] = [];
+        renderedChunks[i][j] = false;
+    });
+
     isoGroup = new Phaser.Group(game);
 
     cube = game.add.isoSprite(0, 0, 0, 'cube');
@@ -146,18 +160,4 @@ $(function () {
     $('#version').text(VERSION);
 
     game = new Phaser.Game($('#render').innerWidth(), window.innerHeight - 50, Phaser.CANVAS, 'render', { preload: preload, create: create, render: render, update: update});
-
-    window.light = $V([0,0.5,1]);
-
-    window.map = new Map(25, 10, '123456789');
-    map.generator.addLayer(125, 3);
-    map.generator.addLayer(25, 8);
-    map.generator.addLayer(5, 100);
-
-    window.tileset = new Tileset(game);
-
-    map.forEachChunkCoord(function(i, j){
-        if(!renderedChunks[i])renderedChunks[i] = [];
-        renderedChunks[i][j] = false;
-    });
 });
