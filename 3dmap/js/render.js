@@ -1,4 +1,4 @@
-VERSION = '0.1.3-b';
+VERSION = '0.1.3-c';
 
 var game;
 var isoGroup;
@@ -54,6 +54,12 @@ function create() {
 
         event.preventDefault();
     };
+
+    var renderElement = document.getElementById('render');
+    var mc = new Hammer(renderElement);
+    mc.on("pinch", function(event) {
+        zoom(event.gesture.scale);
+    });
 
     window.light = $V([0,0.5,1]);
 
