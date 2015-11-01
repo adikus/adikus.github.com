@@ -43,7 +43,7 @@ Chunk.prototype = {
                     points[i][j] += this.mapGenerator.get(layer, x, y) / layer.scale;
                 }, this);
 
-                points[i][j] = $V([i, j, Math.round(points[i][j]) - 80]);
+                points[i][j] = $V([i, j, Math.round(points[i][j]) + heightOffset]);
             }
         }
 
@@ -75,6 +75,11 @@ Chunk.prototype = {
             if(!texture){
                 texture = tileset.render(polygon);
             }
+            if(type != polygon.getType() && !tileset.get(type)){
+                // Workaround - use the original tile
+                type = polygon.getType();
+                texture = tileset.get(type);
+            }
 
             var x = polygon.i*40;
             var y = polygon.j*40;
@@ -88,6 +93,10 @@ Chunk.prototype = {
             if(polygon.top < 0)texture = tileset.get(type+'blue');
 
             tile.texture = texture;
+            if(!texture){
+                console.log(polygon, polygon.getType());
+                throw 'No texture for type ' + type;
+            }
             tile.anchor.set(0.5);
         });
 

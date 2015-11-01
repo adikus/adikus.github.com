@@ -1,5 +1,6 @@
 #render {
 	margin-top: 25px;
+	position: relative;
 }
 
 #version {
@@ -17,4 +18,15 @@
 #test {
 	height: 500px;
 	background: #FF7700;
+}
+
+.start {
+	position: absolute;
+	top: 25px;
+	right: 25px;
+	z-index: 9999;
+}
+
+#height_offset {
+  width: 50px;
 }

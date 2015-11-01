@@ -1,4 +1,4 @@
-VERSION = '0.1.4';
+VERSION = '0.1.4-a';
 
 var game;
 var isoGroup;
@@ -69,7 +69,8 @@ function create() {
 
     window.light = $V([0,0.5,1]);
 
-    window.map = new Map(25, game.device.desktop ? 10 : 3, '123456789');
+    window.heightOffset = parseInt($('#height_offset').val());
+    window.map = new Map(25, game.device.desktop ? 10 : 3, $('#seed').val());
     map.generator.addLayer(125, 3);
     map.generator.addLayer(25, 8);
     map.generator.addLayer(5, 100);
@@ -177,5 +178,15 @@ function render() {
 $(function () {
     $('#version').text(VERSION);
 
-    game = new Phaser.Game($('#render').innerWidth(), window.innerHeight - 50, Phaser.CANVAS, 'render', { preload: preload, create: create, render: render, update: update});
+    $('#seed').val('123456789');
+    $('#height_offset').val('-80');
+
+    var started = false;
+
+    $('#start').click(function(){
+        if(!started){
+            game = new Phaser.Game($('#render').innerWidth(), window.innerHeight - 50, Phaser.CANVAS, 'render', { preload: preload, create: create, render: render, update: update});
+        }
+        started = true;
+    });
 });
