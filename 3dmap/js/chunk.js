@@ -90,8 +90,8 @@ Chunk.prototype = {
         var localBounds = this._group.getLocalBounds();
         var bounds = this._group.getBounds();
 
-        var renderTexture = game.add.renderTexture(this._group.width, this._group.height);
-        renderTexture.renderXY(this._group, -bounds.x, -bounds.y, true);
+        var renderTexture = game.add.renderTexture(Math.round(this._group.width), Math.round(this._group.height));
+        renderTexture.renderXY(this._group, Math.round(-bounds.x), Math.round(-bounds.y), true);
 
         var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * 40, this._y * this._size * 40, 0);
         var position = game.iso.project(anchor);

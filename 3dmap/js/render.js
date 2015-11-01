@@ -1,4 +1,4 @@
-VERSION = '0.1.3-e';
+VERSION = '0.1.3-f';
 
 var game;
 var isoGroup;
@@ -48,7 +48,7 @@ function create() {
 
     cursors = game.input.keyboard.createCursorKeys();
     game.input.mouse.mouseWheelCallback = function(event) {
-        if(event.wheelDelta > 0){
+        if((event.wheelDelta || event.deltaY) > 0){
             zoom(1.05);
         }else{
             zoom(1/1.05);
