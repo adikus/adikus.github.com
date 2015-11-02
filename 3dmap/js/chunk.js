@@ -87,9 +87,9 @@ Chunk.prototype = {
 
             var tile = game.add.isoSprite(x, y, z, null, 0, this._group);
 
-            if(polygon.z < 20)texture = tileset.get(type+'brown');
-            if(polygon.z < 15)texture = tileset.get(type+'green');
-            if(polygon.z < 3)texture = tileset.get(type+'sand');
+            if(polygon.z < 35)texture = tileset.get(type+'brown');
+            if(polygon.z < 20)texture = tileset.get(type+'green');
+            if(polygon.z < 2)texture = tileset.get(type+'sand');
             if(polygon.top < 0)texture = tileset.get(type+'blue');
 
             tile.texture = texture;
