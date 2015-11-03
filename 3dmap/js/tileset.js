@@ -1,6 +1,7 @@
 Tileset = function(game) {
     this._textures = {};
-    this._polygons = {};
+    this._triangleData = {};
+
     this.game = game;
 
     this._initialized = false;
@@ -11,67 +12,68 @@ Tileset.prototype = {
         return this._textures[type];
     },
 
-    render: function(polygon) {
+    draw: function(tile, graphics) {
         if(!this._initialized){
             this._constructProjector();
             this._initialized = true;
         }
 
-        polygon.initSylvester();
+        var contourPoints = [];
 
-        var normalizedPoints = polygon.getNormalizedValues();
-        var projectedPoints = _(normalizedPoints).map(function(p, i) { return this.projector[i][p] }, this);
+        _(tile.triangles).each(function(triangle) {
+            var type = triangle.getTerrainType();
 
-        if(normalizedPoints[1] == normalizedPoints[3]){
-            projectedPoints.unshift(projectedPoints.pop());
-        }
+            if(!this._triangleData[type]){
+                this._calculateTriangleData(triangle)
+            }
+            var triangleData = this._triangleData[type];
 
-        var graphics = new Phaser.Graphics(game, 0, 0);
+            var x = tile.x*40;
+            var y = tile.y*40;
+            var z = _([triangle.bottom*20, 0]).max();
 
-        graphics.beginFill(polygon.color);
-        graphics.drawPolygon(projectedPoints.slice(0,3));
-        graphics.endFill();
+            var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
+            var offset = game.iso.project(offset3D);
 
-        graphics.beginFill(polygon.color2);
-        graphics.drawPolygon(projectedPoints[2], projectedPoints[3], projectedPoints[0]);
-        graphics.endFill();
+            graphics.lineStyle(0, Phaser.Color.getColor(0,0,0), 0);
+
+            var offsetPoints = _(triangleData.points).map(function(p) { return new Phaser.Point(offset.x + p.x, offset.y + p.y); });
+            graphics.lineStyle(2, triangle.getColor(triangleData.shade), 1);
+            graphics.beginFill(triangle.getColor(triangleData.shade));
+            graphics.drawPolygon(offsetPoints);
+            graphics.endFill();
+
+            if(contourPoints.length < 3){
+                contourPoints = offsetPoints;
+            }else{
+                contourPoints.push(offsetPoints[1]);
+            }
+
+        }, this);
 
         graphics.lineStyle(2, Phaser.Color.getColor(0,0,0), 0.3);
-        graphics.moveTo(projectedPoints[0].x, projectedPoints[0].y);
-        graphics.lineTo(projectedPoints[1].x, projectedPoints[1].y);
-        graphics.lineTo(projectedPoints[2].x, projectedPoints[2].y);
-        graphics.lineTo(projectedPoints[3].x, projectedPoints[3].y);
-        graphics.lineTo(projectedPoints[0].x, projectedPoints[0].y);
+        graphics.moveTo(contourPoints[0].x, contourPoints[0].y);
+        graphics.lineTo(contourPoints[1].x, contourPoints[1].y);
+        graphics.lineTo(contourPoints[2].x, contourPoints[2].y);
+        graphics.lineTo(contourPoints[3].x, contourPoints[3].y);
+        graphics.lineTo(contourPoints[0].x, contourPoints[0].y);
+    },
 
-        var renderTexture = game.add.renderTexture(200, 200);
-        renderTexture.renderXY(graphics, 100, 100, true);
-        this._textures[polygon.getType()] = renderTexture;
+    _calculateTriangleData: function(triangle) {
+        var type = triangle.getTerrainType();
 
-        graphics.tint = Phaser.Color.getColor(22, 115, 14);
-        var renderTextureGreen = game.add.renderTexture(200, 200);
-        renderTextureGreen.renderXY(graphics, 100, 100, true);
-        this._textures[polygon.getType()+'green'] = renderTextureGreen;
+        triangle.initSylvester();
 
-        graphics.tint = Phaser.Color.getColor(138, 100, 59);
-        var renderTextureBrown = game.add.renderTexture(200, 200);
-        renderTextureBrown.renderXY(graphics, 100, 100, true);
-        this._textures[polygon.getType()+'brown'] = renderTextureBrown;
+        var normalizedPoints = triangle.getTerrainNormalizedValues();
+        var projectedPoints = _(normalizedPoints).map(function(p, i) {
+            var index = triangle.pointMap[i];
+            return this.projector[index][p]
+        }, this);
 
-        graphics.tint = Phaser.Color.getColor(14, 37, 110);
-        var renderTextureBlue = game.add.renderTexture(200, 200);
-        renderTextureBlue.renderXY(graphics, 100, 100, true);
-        this._textures[polygon.getType()+'blue'] = renderTextureBlue;
-
-        graphics.tint = Phaser.Color.getColor(214, 199, 84);
-        var renderTextureSand = game.add.renderTexture(200, 200);
-        renderTextureSand.renderXY(graphics, 100, 100, true);
-        this._textures[polygon.getType()+'sand'] = renderTextureSand;
-
-        this._polygons[polygon.getType()] = polygon;
-        graphics.visible = false;
-        console.log('Rendered', polygon.getType());
-
-        return this._textures[polygon.getType()];
+        this._triangleData[type] = {
+            points: projectedPoints,
+            shade: triangle.getShade(light)
+        };
     },
 
     _constructProjector: function() {

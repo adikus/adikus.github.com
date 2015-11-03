@@ -1,4 +1,4 @@
-VERSION = '0.1.4-a';
+VERSION = '0.2.0';
 
 var game;
 var isoGroup;
@@ -13,7 +13,7 @@ var previousPointerPosition;
 var renderedChunks = [];
 
 var cube;
-var selectedPoly;
+var selectedTile;
 
 var zoomOnPinchStart;
 
@@ -73,7 +73,7 @@ function create() {
     localStorage.offset = $('#height_offset').val();
 
     window.heightOffset = parseInt(localStorage.offset);
-    window.map = new Map(25, game.device.desktop ? 10 : 3, localStorage.seed);
+    window.map = new Map(15, game.device.desktop ? 15 : 5, localStorage.seed);
     map.generator.addLayer(125, 3);
     map.generator.addLayer(25, 8);
     map.generator.addLayer(5, 100);
@@ -100,10 +100,19 @@ function create() {
         }
     });
 
+    zoom(0.1);
     game.world.setBounds(-10000, -10000, 20000, 20000);
+
+    var centerX = map._chunkCount * map._chunkSize * 20;
+    var center = new Phaser.Plugin.Isometric.Point3(centerX, centerX, 0);
+    var position = game.iso.project(center);
+
+    game.camera.x = position.x*game.camera.scale.x - game.camera.view.halfWidth;
+    game.camera.y = position.y*game.camera.scale.y - game.camera.view.halfHeight;
 }
 
 var chunksRendered = 0;
+var stepsSinceLastRender = Infinity;
 
 function update() {
     if (cursors.up.isDown){
@@ -129,7 +138,7 @@ function update() {
         previousPointerPosition = null;
     }
 
-    if(chunksRendered < renderedChunks.length*renderedChunks.length){
+    if(stepsSinceLastRender >= 0 && chunksRendered < renderedChunks.length*renderedChunks.length){
         for(var i = 0; i < renderedChunks.length; i++) {
             var rendered = false;
             for (var j = 0; j < renderedChunks[0].length; j++) {
@@ -144,21 +153,23 @@ function update() {
             }
             if(rendered)break;
         }
-    }
+
+        stepsSinceLastRender = 0;
+    }else{ stepsSinceLastRender++; }
 
     var pointer = game.input.activePointer;
     for(var j = -50; j < 50; j++){
         var point3 = game.iso.unproject(new Phaser.Point(pointer.worldX/game.world.scale.x, pointer.worldY/game.world.scale.y), undefined, j*20);
         var x = Math.floor(point3.x/40);
         var y = Math.floor(point3.y/40);
-        var chunk = map.getChunk(Math.floor(x/25), Math.floor(y/25));
+        var chunk = map.getChunk(Math.floor(x/map._chunkSize), Math.floor(y/map._chunkSize));
         if(!chunk)continue;
-        var polygon = chunk._polygons[x % 25] && chunk._polygons[x % 25][y % 25];
-        if(polygon && polygon.z <= j && polygon.top >= j){
+        var tile = chunk._tiles[x % map._chunkSize] && chunk._tiles[x % map._chunkSize][y % map._chunkSize];
+        if(tile && tile.bottom <= j && tile.top >= j){
             cube.isoX = Math.floor(point3.x/40)*40;
             cube.isoY = Math.floor(point3.y/40)*40;
-            cube.isoZ = polygon.z*20;
-            selectedPoly = polygon;
+            cube.isoZ = tile.bottom*20;
+            selectedTile = tile;
             break;
         }
     }
@@ -173,8 +184,8 @@ function render() {
     game.debug.text(pos, 2, 45, "#a7aebe");
     var pos2 = Math.round(cube.isoX/40) + ", " + Math.round(cube.isoY/40) + ", " + Math.round(cube.isoZ/20);
     game.debug.text(pos2, 2, 60, "#a7aebe");
-    if(selectedPoly){
-        game.debug.text(selectedPoly.getType(), 2, 75, "#a7aebe");
+    if(selectedTile){
+        game.debug.text(selectedTile.getType(), 2, 75, "#a7aebe");
     }
 }
 

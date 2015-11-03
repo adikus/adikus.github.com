@@ -7,7 +7,7 @@ Chunk = function(mapGenerator, size, x, y) {
 
     this._initialized = false;
 
-    this._polygons = [];
+    this._tiles = [];
 };
 
 Chunk.prototype = {
@@ -22,13 +22,15 @@ Chunk.prototype = {
             this.mapGenerator.interpolateLayerPoints(layer, startX + layer.size, endX - layer.size, startY + layer.size, endY - layer.size);
         }, this);
 
-        this._initializePolygons();
+        this._initializeTiles();
         this._initialized = true;
 
         this._group = new Phaser.Group(game, null);
+        this._graphics = game.add.graphics(0, 0, isoGroup);
+        this._graphics.cacheAsBitmap = true;
     },
 
-    _initializePolygons: function() {
+    _initializeTiles: function() {
         var points = [];
 
         for(var i = 0; i <= this._size; i++) {
@@ -48,79 +50,29 @@ Chunk.prototype = {
         }
 
         this.forEachCoord(function(i, j) {
-            var polygon = new Polygon(points[i][j], points[i + 1][j], points[i + 1][j + 1], points[i][j + 1]);
-            if(!this._polygons[i])this._polygons[i] = [];
-            this._polygons[i][j] = polygon;
+            var tile = new Tile(points[i][j], points[i + 1][j], points[i + 1][j + 1], points[i][j + 1]);
+            if(!this._tiles[i])this._tiles[i] = [];
+            this._tiles[i][j] = tile;
         });
     },
 
     render: function(isoGroup, tileset) {
         if(!this._initialized){
-            this._initialize();
+            this._initialize(isoGroup);
         }
 
         var game = this._group.game;
 
         this.forEachCoord(function(i, j) {
-            var polygon = this._polygons[i][j];
-            var type = polygon.getType();
+            var tile = this._tiles[i][j];
 
-            if(polygon.top < 0){
-                type = '0000';
-            }else if(polygon.top >= 0 && polygon.z < -1){
-                type = _(4).times(function(i){ return Math.max(parseInt(type.charAt(i)) + polygon.z + 1, 0); }).join('');
-            }
-
-            var texture = tileset.get(type);
-            if(!texture){
-                texture = tileset.render(polygon);
-            }
-            if(type != polygon.getType() && !tileset.get(type)){
-                // Workaround - use the original tile
-                type = polygon.getType();
-                texture = tileset.get(type);
-            }
-
-            var x = polygon.i*40;
-            var y = polygon.j*40;
-            var z = polygon.z < 0 ? -20 : polygon.z*20;
-
-            var tile = game.add.isoSprite(x, y, z, null, 0, this._group);
-
-            if(polygon.z < 35)texture = tileset.get(type+'brown');
-            if(polygon.z < 20)texture = tileset.get(type+'green');
-            if(polygon.z < 2)texture = tileset.get(type+'sand');
-            if(polygon.top < 0)texture = tileset.get(type+'blue');
-
-            tile.texture = texture;
-            if(!texture){
-                console.log(polygon, polygon.getType());
-                throw 'No texture for type ' + type;
-            }
-            tile.anchor.set(0.5);
+            tileset.draw(tile, this._graphics);
         });
-
-        //game.iso.simpleSort(this._group);
-
-        var zoom = game.camera.scale.x;
-        game.camera.scale.setTo(1);
-
-        var localBounds = this._group.getLocalBounds();
-        var bounds = this._group.getBounds();
-
-        var renderTexture = game.add.renderTexture(Math.round(this._group.width), Math.round(this._group.height));
-        renderTexture.renderXY(this._group, Math.round(-bounds.x), Math.round(-bounds.y), true);
 
         var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * 40, this._y * this._size * 40, 0);
         var position = game.iso.project(anchor);
-
-        this._group.destroy();
-
-        this._sprite = game.add.sprite(position.x, position.y, null, null, isoGroup);
-        this._sprite.anchor.set(-localBounds.x/localBounds.width, -localBounds.y/localBounds.height);
-        this._sprite.texture = renderTexture;
-
-        game.camera.scale.setTo(zoom);
+        this._graphics.x = position.x;
+        this._graphics.y = position.y;
     },
 
     forEachCoord: function(call, ctx) {
