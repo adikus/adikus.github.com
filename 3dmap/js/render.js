@@ -1,4 +1,4 @@
-VERSION = '0.2.0';
+VERSION = '0.2.0-a';
 
 var game;
 var isoGroup;
@@ -158,7 +158,7 @@ function update() {
     }else{ stepsSinceLastRender++; }
 
     var pointer = game.input.activePointer;
-    for(var j = -50; j < 50; j++){
+    for(var j = 50; j > -50; j--){
         var point3 = game.iso.unproject(new Phaser.Point(pointer.worldX/game.world.scale.x, pointer.worldY/game.world.scale.y), undefined, j*20);
         var x = Math.floor(point3.x/40);
         var y = Math.floor(point3.y/40);
