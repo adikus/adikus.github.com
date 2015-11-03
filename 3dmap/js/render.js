@@ -1,4 +1,4 @@
-VERSION = '0.2.1';
+VERSION = '0.2.1-a';
 
 var game;
 var isoGroup;
@@ -74,7 +74,7 @@ function create() {
     localStorage.offset = $('#height_offset').val();
 
     window.heightOffset = parseInt(localStorage.offset);
-    window.map = new Map(15, game.device.desktop ? 30 : 5, localStorage.seed);
+    window.map = new Map(15, game.device.desktop ? 30 : 10, localStorage.seed);
     map.generator.addLayer(125, 3);
     map.generator.addLayer(25, 8);
     map.generator.addLayer(5, 100);
