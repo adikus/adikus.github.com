@@ -55,7 +55,6 @@ Triangle.prototype = {
             var g = Triangle.gradientMap[i]
             var r_v = Math.min(g, this.top - keys[i - 1]);
             var r_c = Math.max(0, keys[i - 1] + g - this.top);
-            console.log(keys[i - 1], this.top, keys[i - 1] + g, r_v, r_c);
             return (v*r_v + c*r_c)/g*shade;
         }, this);
 
@@ -88,7 +87,8 @@ Triangle.prototype = {
     }
 };
 
-Tile = function(p1, p2, p3, p4) {
+Tile = function(chunk, p1, p2, p3, p4) {
+    this.chunk = chunk;
     this.points = [p1, p2, p3, p4];
 
     this.x = p1.elements[0];

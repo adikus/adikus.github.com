@@ -8,6 +8,7 @@ Chunk = function(mapGenerator, size, x, y) {
     this._initialized = false;
 
     this._tiles = [];
+    this.hidden = true;
 };
 
 Chunk.prototype = {
@@ -27,7 +28,6 @@ Chunk.prototype = {
 
         this._group = new Phaser.Group(game, null);
         this._graphics = game.add.graphics(0, 0, isoGroup);
-        this._graphics.cacheAsBitmap = true;
     },
 
     _initializeTiles: function() {
@@ -50,7 +50,7 @@ Chunk.prototype = {
         }
 
         this.forEachCoord(function(i, j) {
-            var tile = new Tile(points[i][j], points[i + 1][j], points[i + 1][j + 1], points[i][j + 1]);
+            var tile = new Tile(this, points[i][j], points[i + 1][j], points[i + 1][j + 1], points[i][j + 1]);
             if(!this._tiles[i])this._tiles[i] = [];
             this._tiles[i][j] = tile;
         });
@@ -73,6 +73,21 @@ Chunk.prototype = {
         var position = game.iso.project(anchor);
         this._graphics.x = position.x;
         this._graphics.y = position.y;
+        this._graphics.visible = false;
+    },
+
+    hide: function() {
+        if(!this._graphics || this.hidden)return;
+        this._graphics.cacheAsBitmap = false;
+        this._graphics.visible = false;
+        this.hidden = true;
+    },
+
+    show: function() {
+        if(!this._graphics || !this.hidden)return;
+        this._graphics.cacheAsBitmap = true;
+        this._graphics.visible = true;
+        this.hidden = false;
     },
 
     forEachCoord: function(call, ctx) {
