@@ -1,4 +1,4 @@
-VERSION = '0.2.3-b';
+VERSION = '0.2.3-c';
 
 var game;
 var isoGroup;
@@ -76,12 +76,14 @@ function create() {
 
     localStorage.seed = $('#seed').val();
     localStorage.offset = $('#height_offset').val();
+    localStorage.chunkCount = $('#chunk_count').val();
 
     window.heightOffset = parseInt(localStorage.offset);
+    var size = parseInt(localStorage.chunkCount);
     if(game.device.desktop){
-        window.map = new Map(15, 30, localStorage.seed);
+        window.map = new Map(15, localStorage.chunkCount, localStorage.seed);
     }else{
-        window.map = new Map(5, 30, localStorage.seed);
+        window.map = new Map(5, localStorage.chunkCount, localStorage.seed);
     }
     map.generator.addLayer(125, 3);
     map.generator.addLayer(25, 8);
@@ -121,11 +123,11 @@ function create() {
         }
     });
 
-    var x1 = -2*map._chunkSize*40;
-    var x2 = (map._chunkCount+4)*map._chunkSize*40;
+    var x1 = -0.5*map._chunkSize*40;
+    var x2 = (map._chunkCount+1)*map._chunkSize*40;
     var cornerA3 = new Phaser.Plugin.Isometric.Point3(x1, x2, 0);
     var cornerA = game.iso.project(cornerA3);
-    var cornerB3 = new Phaser.Plugin.Isometric.Point3(x1, x1, 0);
+    var cornerB3 = new Phaser.Plugin.Isometric.Point3(x1, x1, 20*100);
     var cornerB = game.iso.project(cornerB3);
     var cornerC3 = new Phaser.Plugin.Isometric.Point3(x2, x1, 0);
     var cornerC = game.iso.project(cornerC3);
@@ -195,11 +197,9 @@ function update() {
     var renderedNow = 0;
     if(chunksRendered < renderedChunks.length*renderedChunks.length){
         for(var i = 0; i < renderedChunks.length; i++) {
-            var rendered = false;
             for (var j = 0; j < renderedChunks[0].length; j++) {
                 if(!renderedChunks[i][j]){
                     var chunk = map.getChunk(i, j);
-                    //chunk.render(isoGroup, tileset);
                     chunk._initialize(isoGroup);
                     renderedChunks[i][j] = true;
                     renderedNow++;
@@ -231,7 +231,7 @@ function update() {
     var pointD3 = game.iso.unproject(pointD, undefined, 0);
 
     minimapOverlay.clear();
-    minimapOverlay.lineStyle(2, Phaser.Color.getColor(0,0,0), 1);
+    minimapOverlay.lineStyle(Math.round(2/minimapScale), Phaser.Color.getColor(0,0,0), 1);
     minimapOverlay.moveTo(pointA3.x/40, pointA3.y/40);
     minimapOverlay.lineTo(pointB3.x/40, pointB3.y/40);
     minimapOverlay.lineTo(pointC3.x/40, pointC3.y/40);
@@ -294,6 +294,7 @@ $(function () {
 
     if($('#seed').val() == '')$('#seed').val(localStorage.seed || '123456789');
     if($('#height_offset').val() == '')$('#height_offset').val(localStorage.offset || '-30');
+    if($('#chunk_count').val() == '')$('#chunk_count').val(localStorage.chunkCount || '30');
 
     var started = false;
 

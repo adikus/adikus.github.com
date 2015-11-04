@@ -27,6 +27,6 @@
 	z-index: 9999;
 }
 
-#height_offset {
+#height_offset, #chunk_count {
   width: 50px;
 }
