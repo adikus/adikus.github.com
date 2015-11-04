@@ -15,7 +15,7 @@ Triangle.pointMap = {
     b: [1,2,3]
 };
 
-Triangle.colorMapKeys = [-15, 0, 3, 10, 25, 35, 1000];
+Triangle.colorMapKeys = [-30, 0, 3, 10, 25, 35, 1000];
 Triangle.colorMap = [
     [18, 29, 99], // Deep blue
     [53, 145, 176], // Light blue
@@ -27,7 +27,7 @@ Triangle.colorMap = [
 ];
 Triangle.gradientMap = [
     false,
-    13, //Light blue to deep blue
+    28, //Light blue to deep blue
     false,
     3, // Green to sand
     9, // Dark green to green
@@ -52,7 +52,7 @@ Triangle.prototype = {
         var rgb = _(Triangle.colorMap[i]).map(function(v, j) {
             if(!Triangle.gradientMap[i])return v*shade;
             var c = Triangle.colorMap[i - 1][j];
-            var g = Triangle.gradientMap[i]
+            var g = Triangle.gradientMap[i];
             var r_v = Math.min(g, this.top - keys[i - 1]);
             var r_c = Math.max(0, keys[i - 1] + g - this.top);
             return (v*r_v + c*r_c)/g*shade;
@@ -140,6 +140,6 @@ Tile.prototype = {
     },
 
     isBeach: function() {
-        return (this.bottom <= 0) &&  (this.top > 0);
+        return (this.bottom <= 0) && (this.top > 0);
     }
 };

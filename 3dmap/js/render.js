@@ -1,4 +1,4 @@
-VERSION = '0.2.2-a';
+VERSION = '0.2.2-b';
 
 var game;
 var isoGroup;
@@ -227,7 +227,7 @@ function update() {
     var pointD3 = game.iso.unproject(pointD, undefined, 0);
 
     minimapOverlay.clear();
-    minimapOverlay.lineStyle(5, Phaser.Color.getColor(0,0,0), 0.3);
+    minimapOverlay.lineStyle(2, Phaser.Color.getColor(0,0,0), 1);
     minimapOverlay.moveTo(pointA3.x/40, pointA3.y/40);
     minimapOverlay.lineTo(pointB3.x/40, pointB3.y/40);
     minimapOverlay.lineTo(pointC3.x/40, pointC3.y/40);

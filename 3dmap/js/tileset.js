@@ -67,7 +67,7 @@ Tileset.prototype = {
         var normalizedPoints = triangle.getTerrainNormalizedValues();
         var projectedPoints = _(normalizedPoints).map(function(p, i) {
             var index = triangle.pointMap[i];
-            return this.projector[index][p]
+            return this.projector[index][p];
         }, this);
 
         this._triangleData[type] = {
