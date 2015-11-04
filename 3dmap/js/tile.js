@@ -36,6 +36,8 @@ Triangle.gradientMap = [
     3, // Grey to brown
     5 // White to grey
 ];
+Triangle.heightColorMap = {};
+Triangle.shadeMap = {};
 
 Triangle.prototype = {
     initSylvester: function() {
@@ -43,25 +45,45 @@ Triangle.prototype = {
     },
 
     getShade: function(light) {
+        if(this.top <= 0)return this.getWaterShade(light);
+        var type = this.getType();
+        if(Triangle.shadeMap[type])return Triangle.shadeMap[type];
+        this.initSylvester();
         var shade = Math.min(Math.abs(light.dot(this.plane.normal)/2),1);
-        return 0.90*shade+0.10;
+        Triangle.shadeMap[type] = 0.90*shade+0.10;
+        return Triangle.shadeMap[type];
+    },
+
+    getWaterShade: function(light) {
+        if(Triangle.shadeMap['w'])return Triangle.shadeMap['w'];
+        var shade = Math.min(Math.abs(light.dot($V([0,0,1]))/2),1);
+        Triangle.shadeMap['w'] = 0.90*shade+0.10;
+        return Triangle.shadeMap['w'];
     },
 
     getColor: function(shade) {
-        var keys = Triangle.colorMapKeys;
-        var i = 0;
-        while(parseInt(keys[i]) < this.top){ i++; }
-        var rgb = _(Triangle.colorMap[i]).map(function(v, j) {
-            if(!Triangle.gradientMap[i])return v*shade;
-            var c = Triangle.colorMap[i - 1][j];
-            var g = Triangle.gradientMap[i];
-            var r_v = Math.min(g, this.top - keys[i - 1]);
-            var r_c = Math.max(0, keys[i - 1] + g - this.top);
-            return (v*r_v + c*r_c)/g*shade;
-        }, this);
+        var color;
+        if(Triangle.heightColorMap[this.top]){
+            color = Triangle.heightColorMap[this.top];
+        }else{
+            var keys = Triangle.colorMapKeys;
+            var i = 0;
+            while(parseInt(keys[i]) < this.top){ i++; }
+            color = _(Triangle.colorMap[i]).map(function(v, j) {
+                if(!Triangle.gradientMap[i])return v;
+                var c = Triangle.colorMap[i - 1][j];
+                var g = Triangle.gradientMap[i];
+                var r_v = Math.min(g, this.top - keys[i - 1]);
+                var r_c = Math.max(0, keys[i - 1] + g - this.top);
+                return (v*r_v + c*r_c)/g;
+            }, this);
+        }
 
-        this._color = Phaser.Color.getColor.apply(null, rgb);
-        return this._color;
+        Triangle.heightColorMap[this.top] = color;
+
+        var rgb = _(color).map(function(v) { return v*shade; });
+
+        return Phaser.Color.getColor.apply(null, rgb);
     },
 
     getValues: function() {

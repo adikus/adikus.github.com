@@ -141,8 +141,6 @@ Tileset.prototype = {
         if(useTerrain === undefined)useTerrain = true;
         var type = useTerrain ? triangle.getTerrainType() : triangle.getType();
 
-        triangle.initSylvester();
-
         var normalizedPoints = useTerrain ? triangle.getTerrainNormalizedValues() : triangle.getNormalizedValues();
         var projectedPoints = _(normalizedPoints).map(function(p, i) {
             var index = triangle.pointMap[i];

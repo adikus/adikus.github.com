@@ -1,4 +1,4 @@
-VERSION = '0.2.3-c';
+VERSION = '0.2.3-d';
 
 var game;
 var isoGroup;
@@ -201,6 +201,7 @@ function update() {
                 if(!renderedChunks[i][j]){
                     var chunk = map.getChunk(i, j);
                     chunk._initialize(isoGroup);
+                    chunk.renderToMinimap(minimapTexture, renderedNow == 20);
                     renderedChunks[i][j] = true;
                     renderedNow++;
                     chunksRendered++;
@@ -248,9 +249,7 @@ function update() {
 
     if(stepsSinceLastRender > 1 && activeChunk){
         var toBeShown = null;
-        var toBeRendered = null;
         var minD = 10;
-        var minD_r = Infinity;
         map.forEachChunkCoord(function(i, j){
             var d = Phaser.Math.distance(activeChunk._x, activeChunk._y, i, j);
             var chunk = map.getChunk(i, j);
@@ -258,19 +257,11 @@ function update() {
                 minD = d;
                 toBeShown = chunk;
             } else if(d >= 10) {
-                if(d < minD_r && !chunk.onMinimap) {
-                    minD_r = d;
-                    toBeRendered = chunk;
-                }
                 map.getChunk(i, j).hide();
             }
         });
 
-        if(toBeShown){ toBeShown.show(isoGroup, tileset); }
-        else if(toBeRendered){
-            toBeRendered.render(isoGroup, tileset);
-            toBeRendered._graphics.clear();
-        }
+        if(toBeShown){ toBeShown.show(isoGroup, tileset, minimapTexture); }
 
         stepsSinceLastRender = 0;
     }else{ stepsSinceLastRender++; }
@@ -285,7 +276,8 @@ function render() {
     if(selectedTile){
         var pos2 = (selectedTile.x+selectedTile.chunk._x*selectedTile.chunk._size) + ", " + (selectedTile.y+selectedTile.chunk._y*selectedTile.chunk._size) + ", " + selectedTile.bottom;
         game.debug.text(pos2, 2, 60, "#a7aebe");
-        game.debug.text(selectedTile.getType(), 2, 75, "#a7aebe");
+        game.debug.text(selectedTile.triangles[0].getType() + ': ' +selectedTile.triangles[0].getShade(light), 2, 75, "#a7aebe");
+        game.debug.text(selectedTile.triangles[1].getType() + ': ' +selectedTile.triangles[1].getShade(light), 2, 90, "#a7aebe");
     }
 }
 

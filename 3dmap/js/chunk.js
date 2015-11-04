@@ -57,7 +57,7 @@ Chunk.prototype = {
         });
     },
 
-    render: function(isoGroup, tileset) {
+    render: function(isoGroup, tileset, minimapTexture) {
         if(!this._initialized){
             this._initialize(isoGroup);
         }
@@ -68,17 +68,26 @@ Chunk.prototype = {
             var tile = this._tiles[i][j];
 
             tileset.draw(tile, this._graphics);
-
-            var color = Phaser.Color.getRGB(tile.triangles[0]._color);
-            var immediate = ((i+1) % this._size == 0) && ((j+1) % this._size == 0);
-            minimapTexture.setPixel(this._x*this._size + i, this._y*this._size + j, color.red, color.green, color.blue, immediate);
-            this.onMinimap = true;
         });
 
         var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * 40, this._y * this._size * 40, 0);
         var position = game.iso.project(anchor);
         this._graphics.x = position.x;
         this._graphics.y = position.y;
+
+        this.renderToMinimap(minimapTexture);
+    },
+
+    renderToMinimap: function(minimapTexture, immediate){
+        this.forEachCoord(function(i, j) {
+            var tile = this._tiles[i][j];
+
+            var triangle = tile.triangles[0];
+            var color = Phaser.Color.getRGB(triangle.getColor(triangle.getShade(light)));
+            var immediate = immediate !== undefined ? immediate : ((i+1) % this._size == 0) && ((j+1) % this._size == 0);
+            minimapTexture.setPixel(this._x*this._size + i, this._y*this._size + j, color.red, color.green, color.blue, immediate);
+            this.onMinimap = true;
+        });
     },
 
     hide: function() {
@@ -90,9 +99,9 @@ Chunk.prototype = {
         this.hidden = true;
     },
 
-    show: function(isoGroup, tileset) {
+    show: function(isoGroup, tileset, minimapTexture) {
         if(!this._graphics || !this.hidden)return;
-        this.render(isoGroup, tileset);
+        this.render(isoGroup, tileset, minimapTexture);
         isoGroup.add(this._graphics);
         this._graphics.cacheAsBitmap = true;
         this._graphics.visible = true;
