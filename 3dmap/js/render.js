@@ -107,6 +107,7 @@ function create() {
     minimapOverlay = game.add.graphics(0,0);
     minimapOverlay.fixedToCamera = true;
     minimapOverlay.cameraOffset.setTo(game.camera.width - size, 0);
+    // TODO: minimapOverlay.mask
 
     game.scale.fullScreenScaleMode = Phaser.ScaleManager.RESIZE;
 

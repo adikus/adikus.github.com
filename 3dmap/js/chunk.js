@@ -69,7 +69,7 @@ Chunk.prototype = {
             tileset.draw(tile, this._graphics);
 
             var color = Phaser.Color.getRGB(tile.triangles[0]._color);
-            var immediate = (i % this._size == 0) && (j % this._size == 0);
+            var immediate = ((i+1) % this._size == 0) && ((j+1) % this._size == 0);
             minimapTexture.setPixel(this._x*this._size + i, this._y*this._size + j, color.red, color.green, color.blue, immediate);
         });
 
