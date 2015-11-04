@@ -1,4 +1,4 @@
-VERSION = '0.2.3-a';
+VERSION = '0.2.3-b';
 
 var game;
 var isoGroup;
@@ -149,7 +149,7 @@ var stepsSinceLastRender = Infinity;
 function findTile(x, y) {
     var point = new Phaser.Point(x, y);
     var foundTile = null;
-    for(var j = 100; j > -100; j--){
+    for(var j = 150; j > -50; j--){
         var point3 = game.iso.unproject(point, undefined, j*20);
         var x = Math.floor(point3.x/40);
         var y = Math.floor(point3.y/40);
@@ -293,7 +293,7 @@ $(function () {
     $('#version').text(VERSION);
 
     if($('#seed').val() == '')$('#seed').val(localStorage.seed || '123456789');
-    if($('#height_offset').val() == '')$('#height_offset').val(localStorage.offset || '-80');
+    if($('#height_offset').val() == '')$('#height_offset').val(localStorage.offset || '-30');
 
     var started = false;
 

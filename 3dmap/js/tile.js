@@ -15,24 +15,26 @@ Triangle.pointMap = {
     b: [1,2,3]
 };
 
-Triangle.colorMapKeys = [-30, 0, 3, 10, 25, 35, 1000];
+Triangle.colorMapKeys = [-30, 0, 3, 20, 75, 85, 100, 1000];
 Triangle.colorMap = [
     [18, 29, 99], // Deep blue
     [53, 145, 176], // Light blue
     [214, 199, 84], //Sand
     [22, 115, 14], // Green
-    [15, 74, 10], // Dark green
+    [12, 59, 8], // Dark green
     [115, 100, 84], // Brown grey
+    [120, 120, 120], // Grey
     [255,255,255] // White
 ];
 Triangle.gradientMap = [
     false,
     28, //Light blue to deep blue
     false,
-    3, // Green to sand
-    9, // Dark green to green
-    4, // Brown to green
-    3 // White to brown
+    5, // Green to sand
+    50, // Dark green to green
+    10, // Brown to green
+    3, // Grey to brown
+    5 // White to grey
 ];
 
 Triangle.prototype = {
