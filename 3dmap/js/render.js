@@ -1,4 +1,4 @@
-VERSION = '0.2.3';
+VERSION = '0.2.3-a';
 
 var game;
 var isoGroup;
@@ -21,6 +21,7 @@ var zoomOnPinchStart;
 var minimap;
 var minimapOverlay;
 var minimapTexture;
+var minimapScale = 1;
 
 function preload() {
     game.load.image('cube', 'assets/cube.png');
@@ -78,7 +79,7 @@ function create() {
 
     window.heightOffset = parseInt(localStorage.offset);
     if(game.device.desktop){
-        window.map = new Map(15, 15, localStorage.seed);
+        window.map = new Map(15, 30, localStorage.seed);
     }else{
         window.map = new Map(5, 30, localStorage.seed);
     }
@@ -98,13 +99,16 @@ function create() {
     mapOverlay = game.add.graphics(0, 0);
 
     var size = map._chunkCount*map._chunkSize;
+    if(size > 300)minimapScale = 300/size;
     minimapTexture = game.make.bitmapData(size, size);
     minimap = game.add.sprite(0, 0, minimapTexture);
     minimap.fixedToCamera = true;
-    minimap.cameraOffset.setTo(game.camera.width - size, 0);
+    minimap.cameraOffset.setTo(game.camera.width - size*minimapScale, 0);
+    minimap.scale.setTo(minimapScale);
     minimapOverlay = game.add.graphics(0,0);
     minimapOverlay.fixedToCamera = true;
-    minimapOverlay.cameraOffset.setTo(game.camera.width - size, 0);
+    minimapOverlay.cameraOffset.setTo(game.camera.width - size*minimapScale, 0);
+    minimapOverlay.scale.setTo(minimapScale);
     // TODO: minimapOverlay.mask
 
     game.scale.fullScreenScaleMode = Phaser.ScaleManager.RESIZE;
@@ -162,8 +166,8 @@ function findTile(x, y) {
 }
 
 function update() {
-    minimap.scale.setTo(1/game.camera.scale.x);
-    minimapOverlay.scale.setTo(1/game.camera.scale.x);
+    minimap.scale.setTo(1/game.camera.scale.x*minimapScale);
+    minimapOverlay.scale.setTo(1/game.camera.scale.x*minimapScale);
 
     if (cursors.up.isDown){
         game.camera.y -= 20;
@@ -188,20 +192,22 @@ function update() {
         previousPointerPosition = null;
     }
 
+    var renderedNow = 0;
     if(chunksRendered < renderedChunks.length*renderedChunks.length){
         for(var i = 0; i < renderedChunks.length; i++) {
             var rendered = false;
             for (var j = 0; j < renderedChunks[0].length; j++) {
                 if(!renderedChunks[i][j]){
                     var chunk = map.getChunk(i, j);
-                    chunk.render(isoGroup, tileset);
+                    //chunk.render(isoGroup, tileset);
+                    chunk._initialize(isoGroup);
                     renderedChunks[i][j] = true;
-                    rendered = true;
+                    renderedNow++;
                     chunksRendered++;
-                    break;
+                    if(renderedNow > 20)break;
                 }
             }
-            if(rendered)break;
+            if(renderedNow > 20)break;
         }
     }
 
@@ -242,18 +248,29 @@ function update() {
 
     if(stepsSinceLastRender > 1 && activeChunk){
         var toBeShown = null;
+        var toBeRendered = null;
         var minD = 10;
+        var minD_r = Infinity;
         map.forEachChunkCoord(function(i, j){
             var d = Phaser.Math.distance(activeChunk._x, activeChunk._y, i, j);
             var chunk = map.getChunk(i, j);
             if(d < minD && chunk.hidden){
                 minD = d;
                 toBeShown = chunk;
+            } else if(d >= 10) {
+                if(d < minD_r && !chunk.onMinimap) {
+                    minD_r = d;
+                    toBeRendered = chunk;
+                }
+                map.getChunk(i, j).hide();
             }
-            else if(d > 10)map.getChunk(i, j).hide();
         });
 
-        if(toBeShown){ toBeShown.show(); }
+        if(toBeShown){ toBeShown.show(isoGroup, tileset); }
+        else if(toBeRendered){
+            toBeRendered.render(isoGroup, tileset);
+            toBeRendered._graphics.clear();
+        }
 
         stepsSinceLastRender = 0;
     }else{ stepsSinceLastRender++; }

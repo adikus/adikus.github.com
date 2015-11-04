@@ -58,6 +58,11 @@ Tileset.prototype = {
     },
 
     drawOverlay: function(tile, graphics) {
+        if(!this._initialized){
+            this._constructProjector();
+            this._initialized = true;
+        }
+
         graphics.clear();
 
         var contourPoints = [];
@@ -66,7 +71,7 @@ Tileset.prototype = {
             var type = triangle.getType();
 
             if(!this._triangleData[type]){
-                this._calculateTriangleData(triangle)
+                this._calculateTriangleData(triangle, false)
             }
             var triangleData = this._triangleData[type];
 
@@ -132,12 +137,13 @@ Tileset.prototype = {
         graphics.lineTo(contourPoints[0].x, contourPoints[0].y);
     },
 
-    _calculateTriangleData: function(triangle) {
-        var type = triangle.getTerrainType();
+    _calculateTriangleData: function(triangle, useTerrain) {
+        if(useTerrain === undefined)useTerrain = true;
+        var type = useTerrain ? triangle.getTerrainType() : triangle.getType();
 
         triangle.initSylvester();
 
-        var normalizedPoints = triangle.getTerrainNormalizedValues();
+        var normalizedPoints = useTerrain ? triangle.getTerrainNormalizedValues() : triangle.getNormalizedValues();
         var projectedPoints = _(normalizedPoints).map(function(p, i) {
             var index = triangle.pointMap[i];
             return this.projector[index][p];

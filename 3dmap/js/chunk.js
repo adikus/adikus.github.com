@@ -9,6 +9,8 @@ Chunk = function(mapGenerator, size, x, y) {
 
     this._tiles = [];
     this.hidden = true;
+
+    this.onMinimap = false;
 };
 
 Chunk.prototype = {
@@ -26,8 +28,7 @@ Chunk.prototype = {
         this._initializeTiles();
         this._initialized = true;
 
-        this._group = new Phaser.Group(game, null);
-        this._graphics = game.add.graphics(0, 0, isoGroup);
+        this._graphics = game.make.graphics(0, 0);
     },
 
     _initializeTiles: function() {
@@ -61,7 +62,7 @@ Chunk.prototype = {
             this._initialize(isoGroup);
         }
 
-        var game = this._group.game;
+        var game = isoGroup.game;
 
         this.forEachCoord(function(i, j) {
             var tile = this._tiles[i][j];
@@ -71,24 +72,28 @@ Chunk.prototype = {
             var color = Phaser.Color.getRGB(tile.triangles[0]._color);
             var immediate = ((i+1) % this._size == 0) && ((j+1) % this._size == 0);
             minimapTexture.setPixel(this._x*this._size + i, this._y*this._size + j, color.red, color.green, color.blue, immediate);
+            this.onMinimap = true;
         });
 
         var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * 40, this._y * this._size * 40, 0);
         var position = game.iso.project(anchor);
         this._graphics.x = position.x;
         this._graphics.y = position.y;
-        this._graphics.visible = false;
     },
 
     hide: function() {
         if(!this._graphics || this.hidden)return;
         this._graphics.cacheAsBitmap = false;
         this._graphics.visible = false;
+        this._graphics.clear();
+        this._graphics.parent.remove(this._graphics);
         this.hidden = true;
     },
 
-    show: function() {
+    show: function(isoGroup, tileset) {
         if(!this._graphics || !this.hidden)return;
+        this.render(isoGroup, tileset);
+        isoGroup.add(this._graphics);
         this._graphics.cacheAsBitmap = true;
         this._graphics.visible = true;
         this.hidden = false;
