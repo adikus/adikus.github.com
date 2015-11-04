@@ -72,7 +72,7 @@ Chunk.prototype = {
             tileset.draw(tile, this._graphics);
         });
 
-        var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * 40, this._y * this._size * 40, 0);
+        var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * TILE_SIZE, this._y * this._size * TILE_SIZE, 0);
         var position = game.iso.project(anchor);
         this._graphics.x = position.x;
         this._graphics.y = position.y;

@@ -28,9 +28,9 @@ Tileset.prototype = {
             }
             var triangleData = this._triangleData[type];
 
-            var x = tile.x*40;
-            var y = tile.y*40;
-            var z = _([triangle.bottom*20, 0]).max();
+            var x = tile.x*TILE_SIZE;
+            var y = tile.y*TILE_SIZE;
+            var z = _([triangle.bottom*TILE_HEIGHT, 0]).max();
 
             var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
             var offset = game.iso.project(offset3D);
@@ -49,7 +49,7 @@ Tileset.prototype = {
 
         }, this);
 
-        graphics.lineStyle(2, Phaser.Color.getColor(0,0,0), 0.3);
+        graphics.lineStyle(1, Phaser.Color.getColor(0,0,0), 0.3);
         graphics.moveTo(contourPoints[0].x, contourPoints[0].y);
         graphics.lineTo(contourPoints[1].x, contourPoints[1].y);
         graphics.lineTo(contourPoints[2].x, contourPoints[2].y);
@@ -77,9 +77,9 @@ Tileset.prototype = {
 
             var chunk = tile.chunk;
 
-            var x = (chunk._x*chunk._size + tile.x)*40;
-            var y = (chunk._y*chunk._size + tile.y)*40;
-            var z = triangle.bottom*20;
+            var x = (chunk._x*chunk._size + tile.x)*TILE_SIZE;
+            var y = (chunk._y*chunk._size + tile.y)*TILE_SIZE;
+            var z = triangle.bottom*TILE_HEIGHT;
 
             var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
             var offset = game.iso.project(offset3D);
@@ -111,9 +111,9 @@ Tileset.prototype = {
 
                 var chunk = tile.chunk;
 
-                var x = (chunk._x*chunk._size + tile.x)*40;
-                var y = (chunk._y*chunk._size + tile.y)*40;
-                var z = _([triangle.bottom*20, 0]).max();
+                var x = (chunk._x*chunk._size + tile.x)*TILE_SIZE;
+                var y = (chunk._y*chunk._size + tile.y)*TILE_SIZE;
+                var z = _([triangle.bottom*TILE_HEIGHT, 0]).max();
 
                 var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
                 var offset = game.iso.project(offset3D);
@@ -129,7 +129,7 @@ Tileset.prototype = {
             }, this);
         }
 
-        graphics.lineStyle(3, Phaser.Color.getColor(0,0,0), 0.5);
+        graphics.lineStyle(2, Phaser.Color.getColor(0,0,0), 0.5);
         graphics.moveTo(contourPoints[0].x, contourPoints[0].y);
         graphics.lineTo(contourPoints[1].x, contourPoints[1].y);
         graphics.lineTo(contourPoints[2].x, contourPoints[2].y);
@@ -166,7 +166,7 @@ Tileset.prototype = {
         for(var i = 0; i <= 4; i++){
             for(var j = 0; j < 4; j++){
                 var point2 = corners[j];
-                var point3 = new Phaser.Plugin.Isometric.Point3(point2.x * 40, point2.y * 40, i * 20);
+                var point3 = new Phaser.Plugin.Isometric.Point3(point2.x * TILE_SIZE, point2.y * TILE_SIZE, i * TILE_HEIGHT);
                 this.projector[j][i] = this.game.iso.project(point3);
             }
         }

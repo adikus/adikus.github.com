@@ -1,4 +1,7 @@
-VERSION = '0.2.3-e';
+VERSION = '0.2.3-f';
+
+TILE_SIZE = 15;
+TILE_HEIGHT = 7;
 
 var game;
 var isoGroup;
@@ -6,7 +9,7 @@ var cursors;
 var isoBounds;
 
 var scaleDown = 3;
-var size = 40/scaleDown;
+var size = TILE_SIZE/scaleDown;
 var sprite;
 
 var previousPointerPosition;
@@ -41,7 +44,7 @@ function zoom(scale) {
     var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
 
     var s = game.camera.scale.x;
-    var zoom = Phaser.Math.clamp(s*scale, 0.3, 2);
+    var zoom = Phaser.Math.clamp(s*scale, 0.4, 3);
 
     game.camera.scale.setTo(zoom);
 
@@ -93,7 +96,7 @@ function create() {
         window.heightOffset = parseInt(localStorage.offset);
         var size = parseInt(localStorage.chunkCount);
         if(game.device.desktop){
-            window.map = new Map(15, localStorage.chunkCount, localStorage.seed);
+            window.map = new Map(20, localStorage.chunkCount, localStorage.seed);
         }else{
             window.map = new Map(5, localStorage.chunkCount, localStorage.seed);
         }
@@ -137,11 +140,11 @@ function create() {
         }
     });
 
-    var x1 = -0.5*map._chunkSize*40;
-    var x2 = (map._chunkCount+1)*map._chunkSize*40;
+    var x1 = -0.5*map._chunkSize*TILE_SIZE;
+    var x2 = (map._chunkCount+1)*map._chunkSize*TILE_SIZE;
     var cornerA3 = new Phaser.Plugin.Isometric.Point3(x1, x2, 0);
     var cornerA = game.iso.project(cornerA3);
-    var cornerB3 = new Phaser.Plugin.Isometric.Point3(x1, x1, 20*100);
+    var cornerB3 = new Phaser.Plugin.Isometric.Point3(x1, x1, TILE_HEIGHT*100);
     var cornerB = game.iso.project(cornerB3);
     var cornerC3 = new Phaser.Plugin.Isometric.Point3(x2, x1, 0);
     var cornerC = game.iso.project(cornerC3);
@@ -149,9 +152,9 @@ function create() {
     var cornerD = game.iso.project(cornerD3);
     isoBounds = {x: cornerA.x, y: cornerB.y, width: cornerC.x - cornerA.x, height: cornerD.y - cornerB.y};
 
-    zoom(0.3);
+    zoom(0.75);
 
-    var centerX = map._chunkCount * map._chunkSize * 20;
+    var centerX = map._chunkCount * map._chunkSize * TILE_SIZE / 2;
     var center = new Phaser.Plugin.Isometric.Point3(centerX, centerX, 0);
     var position = game.iso.project(center);
 
@@ -166,9 +169,9 @@ function findTile(x, y) {
     var point = new Phaser.Point(x, y);
     var foundTile = null;
     for(var j = 150; j > -50; j--){
-        var point3 = game.iso.unproject(point, undefined, j*20);
-        var x = Math.floor(point3.x/40);
-        var y = Math.floor(point3.y/40);
+        var point3 = game.iso.unproject(point, undefined, j*TILE_HEIGHT);
+        var x = Math.floor(point3.x/TILE_SIZE);
+        var y = Math.floor(point3.y/TILE_SIZE);
         var chunk = map.getChunk(Math.floor(x/map._chunkSize), Math.floor(y/map._chunkSize));
         if(!chunk)continue;
         var tile = chunk._tiles[x % map._chunkSize] && chunk._tiles[x % map._chunkSize][y % map._chunkSize];
@@ -226,11 +229,8 @@ function update() {
         }
     }
 
-    var x = (game.camera.x + game.camera.view.halfWidth)/game.world.scale.x;
-    var y = (game.camera.y + game.camera.view.halfHeight)/game.world.scale.y;
-    var centerTile = findTile(x, y);
-    var activeChunk = centerTile ? centerTile.chunk : null;
-
+    var cx = (game.camera.x + game.camera.view.halfWidth)/game.world.scale.x;
+    var cy = (game.camera.y + game.camera.view.halfHeight)/game.world.scale.y;
     var x1 = game.camera.x/game.world.scale.x;
     var x2 = (game.camera.x + game.camera.view.width)/game.world.scale.x;
     var y1 = game.camera.y/game.world.scale.y;
@@ -244,14 +244,25 @@ function update() {
     var pointC3 = game.iso.unproject(pointC, undefined, 0);
     var pointD = new Phaser.Point(x1, y2);
     var pointD3 = game.iso.unproject(pointD, undefined, 0);
+    var pointCenter = new Phaser.Point(cx, cy);
+    var pointCenter3 = game.iso.unproject(pointCenter, undefined, 0);
 
     minimapOverlay.clear();
+
+    map.forEachChunkCoord(function(i, j) {
+        if(map.getChunk(i, j).hidden){
+            minimapOverlay.beginFill(Phaser.Color.getColor(0,0,0), 0.3);
+            minimapOverlay.drawRect(i*map._chunkSize, j*map._chunkSize, map._chunkSize, map._chunkSize);
+            minimapOverlay.endFill();
+        }
+    });
+
     minimapOverlay.lineStyle(Math.round(2/minimapScale), Phaser.Color.getColor(0,0,0), 1);
-    minimapOverlay.moveTo(pointA3.x/40, pointA3.y/40);
-    minimapOverlay.lineTo(pointB3.x/40, pointB3.y/40);
-    minimapOverlay.lineTo(pointC3.x/40, pointC3.y/40);
-    minimapOverlay.lineTo(pointD3.x/40, pointD3.y/40);
-    minimapOverlay.lineTo(pointA3.x/40, pointA3.y/40);
+    minimapOverlay.moveTo(pointA3.x/TILE_SIZE, pointA3.y/TILE_SIZE);
+    minimapOverlay.lineTo(pointB3.x/TILE_SIZE, pointB3.y/TILE_SIZE);
+    minimapOverlay.lineTo(pointC3.x/TILE_SIZE, pointC3.y/TILE_SIZE);
+    minimapOverlay.lineTo(pointD3.x/TILE_SIZE, pointD3.y/TILE_SIZE);
+    minimapOverlay.lineTo(pointA3.x/TILE_SIZE, pointA3.y/TILE_SIZE);
 
     var pointer = game.input.activePointer;
     var px = pointer.worldX/game.world.scale.x;
@@ -261,16 +272,22 @@ function update() {
         tileset.drawOverlay(selectedTile, mapOverlay);
     }
 
-    if(stepsSinceLastRender > 1 && activeChunk){
+    if(stepsSinceLastRender > 1){
+        var border = map._chunkSize * TILE_SIZE * 1.5;
+        var bounds = new Phaser.Polygon(pointA3.add(-border, 0), pointB3.add(0, -border), pointC3.add(border, 0), pointD3.add(0, border));
         var toBeShown = null;
-        var minD = 10;
+        var minD = Infinity;
         map.forEachChunkCoord(function(i, j){
-            var d = Phaser.Math.distance(activeChunk._x, activeChunk._y, i, j);
+            var d = Phaser.Math.distanceSq(pointCenter3.x/map._chunkSize/TILE_SIZE, pointCenter3.y/map._chunkSize/TILE_SIZE, i, j);
             var chunk = map.getChunk(i, j);
-            if(d < minD && chunk.hidden){
-                minD = d;
-                toBeShown = chunk;
-            } else if(d >= 10) {
+            var x = chunk._x * chunk._size * TILE_SIZE;
+            var y = chunk._y * chunk._size * TILE_SIZE;
+            if(chunk._graphics && bounds.contains(x, y)){
+                if(d < minD && chunk.hidden){
+                    minD = d;
+                    toBeShown = chunk;
+                }
+            }else{
                 map.getChunk(i, j).hide();
             }
         });
@@ -299,7 +316,7 @@ $(function () {
 
     if($('#seed').val() == '')$('#seed').val(localStorage.seed || '123456789');
     if($('#height_offset').val() == '')$('#height_offset').val(localStorage.offset || '-50');
-    if($('#chunk_count').val() == '')$('#chunk_count').val(localStorage.chunkCount || '30');
+    if($('#chunk_count').val() == '')$('#chunk_count').val(localStorage.chunkCount || '20');
 
     var started = false;
 
