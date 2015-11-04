@@ -1,4 +1,4 @@
-VERSION = '0.2.2-b';
+VERSION = '0.2.3';
 
 var game;
 var isoGroup;
@@ -13,8 +13,8 @@ var previousPointerPosition;
 
 var renderedChunks = [];
 
-var cube;
 var selectedTile;
+var mapOverlay;
 
 var zoomOnPinchStart;
 
@@ -44,7 +44,6 @@ function zoom(scale) {
     game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
     game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
 
-    var bounds = isoGroup.getLocalBounds();
     game.world.setBounds(isoBounds.x*zoom, isoBounds.y*zoom, isoBounds.width*zoom, isoBounds.height*zoom);
 }
 
@@ -79,7 +78,7 @@ function create() {
 
     window.heightOffset = parseInt(localStorage.offset);
     if(game.device.desktop){
-        window.map = new Map(15, 25, localStorage.seed);
+        window.map = new Map(15, 15, localStorage.seed);
     }else{
         window.map = new Map(5, 30, localStorage.seed);
     }
@@ -96,8 +95,7 @@ function create() {
 
     isoGroup = new Phaser.Group(game);
 
-    cube = game.add.isoSprite(0, 0, 0, 'cube');
-    cube.anchor.set(0.5);
+    mapOverlay = game.add.graphics(0, 0);
 
     var size = map._chunkCount*map._chunkSize;
     minimapTexture = game.make.bitmapData(size, size);
@@ -237,12 +235,9 @@ function update() {
     var pointer = game.input.activePointer;
     var px = pointer.worldX/game.world.scale.x;
     var py = pointer.worldY/game.world.scale.y;
-    var selectedTile = findTile(px, py);
+    selectedTile = findTile(px, py);
     if(selectedTile){
-        //console.log(selectedTile);
-        cube.isoX = (selectedTile.x + selectedTile.chunk._x * map._chunkSize)*40;
-        cube.isoY = (selectedTile.y + selectedTile.chunk._y * map._chunkSize)*40;
-        cube.isoZ = selectedTile.bottom*20;
+        tileset.drawOverlay(selectedTile, mapOverlay);
     }
 
     if(stepsSinceLastRender > 1 && activeChunk){
@@ -268,11 +263,11 @@ function render() {
     game.debug.text(game.time.fps || '--', 2, 14, "#a7aebe");
     game.debug.text(chunksRendered, 2, 30, "#a7aebe");
     var pointer = game.input.activePointer;
-    var pos = pointer.worldX/game.world.scale.x + ", " + pointer.worldY/game.world.scale.y;
+    var pos = Math.round(pointer.worldX/game.world.scale.x) + ", " + Math.round(pointer.worldY/game.world.scale.y);
     game.debug.text(pos, 2, 45, "#a7aebe");
-    var pos2 = Math.round(cube.isoX/40) + ", " + Math.round(cube.isoY/40) + ", " + Math.round(cube.isoZ/20);
-    game.debug.text(pos2, 2, 60, "#a7aebe");
     if(selectedTile){
+        var pos2 = (selectedTile.x+selectedTile.chunk._x*selectedTile.chunk._size) + ", " + (selectedTile.y+selectedTile.chunk._y*selectedTile.chunk._size) + ", " + selectedTile.bottom;
+        game.debug.text(pos2, 2, 60, "#a7aebe");
         game.debug.text(selectedTile.getType(), 2, 75, "#a7aebe");
     }
 }
