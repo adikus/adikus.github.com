@@ -1,4 +1,4 @@
-VERSION = '0.2.1-b';
+VERSION = '0.2.2';
 
 var game;
 var isoGroup;
@@ -17,6 +17,10 @@ var cube;
 var selectedTile;
 
 var zoomOnPinchStart;
+
+var minimap;
+var minimapOverlay;
+var minimapTexture;
 
 function preload() {
     game.load.image('cube', 'assets/cube.png');
@@ -75,7 +79,7 @@ function create() {
 
     window.heightOffset = parseInt(localStorage.offset);
     if(game.device.desktop){
-        window.map = new Map(15, 30, localStorage.seed);
+        window.map = new Map(15, 25, localStorage.seed);
     }else{
         window.map = new Map(5, 30, localStorage.seed);
     }
@@ -94,6 +98,15 @@ function create() {
 
     cube = game.add.isoSprite(0, 0, 0, 'cube');
     cube.anchor.set(0.5);
+
+    var size = map._chunkCount*map._chunkSize;
+    minimapTexture = game.make.bitmapData(size, size);
+    minimap = game.add.sprite(0, 0, minimapTexture);
+    minimap.fixedToCamera = true;
+    minimap.cameraOffset.setTo(game.camera.width - size, 0);
+    minimapOverlay = game.add.graphics(0,0);
+    minimapOverlay.fixedToCamera = true;
+    minimapOverlay.cameraOffset.setTo(game.camera.width - size, 0);
 
     game.scale.fullScreenScaleMode = Phaser.ScaleManager.RESIZE;
 
@@ -150,6 +163,9 @@ function findTile(x, y) {
 }
 
 function update() {
+    minimap.scale.setTo(1/game.camera.scale.x);
+    minimapOverlay.scale.setTo(1/game.camera.scale.x);
+
     if (cursors.up.isDown){
         game.camera.y -= 20;
     }
@@ -195,6 +211,28 @@ function update() {
     var centerTile = findTile(x, y);
     var activeChunk = centerTile ? centerTile.chunk : null;
 
+    var x1 = game.camera.x/game.world.scale.x;
+    var x2 = (game.camera.x + game.camera.view.width)/game.world.scale.x;
+    var y1 = game.camera.y/game.world.scale.y;
+    var y2 = (game.camera.y + game.camera.view.height)/game.world.scale.y;
+
+    var pointA = new Phaser.Point(x1, y1);
+    var pointA3 = game.iso.unproject(pointA, undefined, 0);
+    var pointB = new Phaser.Point(x2, y1);
+    var pointB3 = game.iso.unproject(pointB, undefined, 0);
+    var pointC = new Phaser.Point(x2, y2);
+    var pointC3 = game.iso.unproject(pointC, undefined, 0);
+    var pointD = new Phaser.Point(x1, y2);
+    var pointD3 = game.iso.unproject(pointD, undefined, 0);
+
+    minimapOverlay.clear();
+    minimapOverlay.lineStyle(5, Phaser.Color.getColor(0,0,0), 0.3);
+    minimapOverlay.moveTo(pointA3.x/40, pointA3.y/40);
+    minimapOverlay.lineTo(pointB3.x/40, pointB3.y/40);
+    minimapOverlay.lineTo(pointC3.x/40, pointC3.y/40);
+    minimapOverlay.lineTo(pointD3.x/40, pointD3.y/40);
+    minimapOverlay.lineTo(pointA3.x/40, pointA3.y/40);
+
     var pointer = game.input.activePointer;
     var px = pointer.worldX/game.world.scale.x;
     var py = pointer.worldY/game.world.scale.y;
@@ -205,27 +243,6 @@ function update() {
         cube.isoY = (selectedTile.y + selectedTile.chunk._y * map._chunkSize)*40;
         cube.isoZ = selectedTile.bottom*20;
     }
-
-
-    //var point = new Phaser.Point(x, y);
-    //var foundTile = null;
-    //var activeChunk = null;
-    //for(var j = 100; j > -100; j--){
-    //    var point3 = game.iso.unproject(point, undefined, j*20);
-    //    var x = Math.floor(point3.x/40);
-    //    var y = Math.floor(point3.y/40);
-    //    var chunk = map.getChunk(Math.floor(x/map._chunkSize), Math.floor(y/map._chunkSize));
-    //    if(!chunk)continue;
-    //    var tile = chunk._tiles[x % map._chunkSize] && chunk._tiles[x % map._chunkSize][y % map._chunkSize];
-    //    if(tile && tile.bottom <= j && tile.top >= j){
-    //        cube.isoX = Math.floor(point3.x/40)*40;
-    //        cube.isoY = Math.floor(point3.y/40)*40;
-    //        cube.isoZ = tile.bottom*20;
-    //        foundTile = tile;
-    //        activeChunk = chunk;
-    //        break;
-    //    }
-    //}
 
     if(stepsSinceLastRender > 1 && activeChunk){
         var toBeShown = null;
@@ -250,7 +267,7 @@ function render() {
     game.debug.text(game.time.fps || '--', 2, 14, "#a7aebe");
     game.debug.text(chunksRendered, 2, 30, "#a7aebe");
     var pointer = game.input.activePointer;
-    var pos = pointer.worldX + ", " + pointer.worldY;
+    var pos = pointer.worldX/game.world.scale.x + ", " + pointer.worldY/game.world.scale.y;
     game.debug.text(pos, 2, 45, "#a7aebe");
     var pos2 = Math.round(cube.isoX/40) + ", " + Math.round(cube.isoY/40) + ", " + Math.round(cube.isoZ/20);
     game.debug.text(pos2, 2, 60, "#a7aebe");

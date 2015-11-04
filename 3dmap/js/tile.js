@@ -58,7 +58,8 @@ Triangle.prototype = {
             return (v*r_v + c*r_c)/g*shade;
         }, this);
 
-        return Phaser.Color.getColor.apply(null, rgb);
+        this._color = Phaser.Color.getColor.apply(null, rgb);
+        return this._color;
     },
 
     getValues: function() {

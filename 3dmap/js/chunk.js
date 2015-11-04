@@ -67,6 +67,10 @@ Chunk.prototype = {
             var tile = this._tiles[i][j];
 
             tileset.draw(tile, this._graphics);
+
+            var color = Phaser.Color.getRGB(tile.triangles[0]._color);
+            var immediate = (i % this._size == 0) && (j % this._size == 0);
+            minimapTexture.setPixel(this._x*this._size + i, this._y*this._size + j, color.red, color.green, color.blue, immediate);
         });
 
         var anchor = new Phaser.Plugin.Isometric.Point3(this._x * this._size * 40, this._y * this._size * 40, 0);
