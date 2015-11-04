@@ -1,4 +1,4 @@
-VERSION = '0.2.3-d';
+VERSION = '0.2.3-e';
 
 var game;
 var isoGroup;
@@ -23,8 +23,11 @@ var minimapOverlay;
 var minimapTexture;
 var minimapScale = 1;
 
+var fromHeightMap;
+
 function preload() {
     game.load.image('cube', 'assets/cube.png');
+    game.load.image('map', 'assets/height_map600.png');
 
     //game.add.plugin(Phaser.Plugin.Debug);
 
@@ -74,20 +77,31 @@ function create() {
 
     window.light = $V([0,0.5,1]);
 
-    localStorage.seed = $('#seed').val();
-    localStorage.offset = $('#height_offset').val();
-    localStorage.chunkCount = $('#chunk_count').val();
-
-    window.heightOffset = parseInt(localStorage.offset);
-    var size = parseInt(localStorage.chunkCount);
-    if(game.device.desktop){
-        window.map = new Map(15, localStorage.chunkCount, localStorage.seed);
+    if(fromHeightMap){
+        var img = game.cache.getImage('map');
+        window.map = new Map(15, Math.floor(img.width / 15));
+        var bmd = game.make.bitmapData(img.width, img.height);
+        bmd.draw(game.cache.getImage('map'), 0, 0);
+        bmd.update();
+        window.heightOffset = 10;
+        map.generator.fromHeightMap(bmd, 50);
     }else{
-        window.map = new Map(5, localStorage.chunkCount, localStorage.seed);
+        localStorage.seed = $('#seed').val();
+        localStorage.offset = $('#height_offset').val();
+        localStorage.chunkCount = $('#chunk_count').val();
+
+        window.heightOffset = parseInt(localStorage.offset);
+        var size = parseInt(localStorage.chunkCount);
+        if(game.device.desktop){
+            window.map = new Map(15, localStorage.chunkCount, localStorage.seed);
+        }else{
+            window.map = new Map(5, localStorage.chunkCount, localStorage.seed);
+        }
+        map.generator.addLayer(200, 4);
+        map.generator.addLayer(80, 7);
+        map.generator.addLayer(20, 15);
+        map.generator.addLayer(5, 100);
     }
-    map.generator.addLayer(125, 3);
-    map.generator.addLayer(25, 8);
-    map.generator.addLayer(5, 100);
 
     window.tileset = new Tileset(game);
 
@@ -276,8 +290,7 @@ function render() {
     if(selectedTile){
         var pos2 = (selectedTile.x+selectedTile.chunk._x*selectedTile.chunk._size) + ", " + (selectedTile.y+selectedTile.chunk._y*selectedTile.chunk._size) + ", " + selectedTile.bottom;
         game.debug.text(pos2, 2, 60, "#a7aebe");
-        game.debug.text(selectedTile.triangles[0].getType() + ': ' +selectedTile.triangles[0].getShade(light), 2, 75, "#a7aebe");
-        game.debug.text(selectedTile.triangles[1].getType() + ': ' +selectedTile.triangles[1].getShade(light), 2, 90, "#a7aebe");
+        game.debug.text(selectedTile.triangles[0].getType() + ', ' +selectedTile.triangles[1].getType(), 2, 75, "#a7aebe");
     }
 }
 
@@ -285,12 +298,13 @@ $(function () {
     $('#version').text(VERSION);
 
     if($('#seed').val() == '')$('#seed').val(localStorage.seed || '123456789');
-    if($('#height_offset').val() == '')$('#height_offset').val(localStorage.offset || '-30');
+    if($('#height_offset').val() == '')$('#height_offset').val(localStorage.offset || '-50');
     if($('#chunk_count').val() == '')$('#chunk_count').val(localStorage.chunkCount || '30');
 
     var started = false;
 
-    $('#start').click(function(){
+    $('.start-button').click(function(){
+        fromHeightMap = $(this).attr('id') !== 'start';
         if(!started){
             game = new Phaser.Game($('#render').innerWidth(), window.innerHeight - 50, Phaser.CANVAS, 'render', { preload: preload, create: create, render: render, update: update});
         }

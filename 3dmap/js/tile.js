@@ -15,7 +15,7 @@ Triangle.pointMap = {
     b: [1,2,3]
 };
 
-Triangle.colorMapKeys = [-30, 0, 3, 20, 75, 85, 100, 1000];
+Triangle.colorMapKeys = [-15, 0, 1, 10, 32, 42, 50, 1000];
 Triangle.colorMap = [
     [18, 29, 99], // Deep blue
     [53, 145, 176], // Light blue
@@ -28,13 +28,13 @@ Triangle.colorMap = [
 ];
 Triangle.gradientMap = [
     false,
-    28, //Light blue to deep blue
+    14, //Light blue to deep blue
     false,
-    5, // Green to sand
-    50, // Dark green to green
-    10, // Brown to green
-    3, // Grey to brown
-    5 // White to grey
+    4, // Green to sand
+    20, // Dark green to green
+    5, // Brown to green
+    2, // Grey to brown
+    3 // White to grey
 ];
 Triangle.heightColorMap = {};
 Triangle.shadeMap = {};
@@ -50,14 +50,14 @@ Triangle.prototype = {
         if(Triangle.shadeMap[type])return Triangle.shadeMap[type];
         this.initSylvester();
         var shade = Math.min(Math.abs(light.dot(this.plane.normal)/2),1);
-        Triangle.shadeMap[type] = 0.90*shade+0.10;
+        Triangle.shadeMap[type] = 0.80*shade+0.20;
         return Triangle.shadeMap[type];
     },
 
     getWaterShade: function(light) {
         if(Triangle.shadeMap['w'])return Triangle.shadeMap['w'];
         var shade = Math.min(Math.abs(light.dot($V([0,0,1]))/2),1);
-        Triangle.shadeMap['w'] = 0.90*shade+0.10;
+        Triangle.shadeMap['w'] = 0.80*shade+0.20;
         return Triangle.shadeMap['w'];
     },
 

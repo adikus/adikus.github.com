@@ -9,6 +9,17 @@ MapGenerator.prototype = {
         this._layers.push({size: size, scale: scale, map: [], interpolated: [], startPoint: null})
     },
 
+    fromHeightMap: function(heightMap, scale) {
+        var layer = {isHeightMap: true, scale: 1, map: []};
+        for(var i = 0; i < heightMap.width; i++){
+            for(var j = 0; j < heightMap.height; j++){
+                if(!layer.map[i])layer.map[i] = [];
+                layer.map[i][j] = heightMap.getPixelRGB(i, j).r / 255 * scale;
+            }
+        }
+        this._layers.push(layer);
+    },
+
     forEachLayer: function(call, ctx) {
         for(var i = 0; i < this._layers.length; i++) {
             call.call(ctx || this, this._layers[i]);
@@ -20,6 +31,7 @@ MapGenerator.prototype = {
     },
 
     initLayerPoints: function(layer, x1, x2, y1, y2){
+        if(layer.isHeightMap)return;
         x1 = Math.ceil(x1/layer.size)*layer.size;
         y1 = Math.ceil(y1/layer.size)*layer.size;
         for(var i = x1; i <= x2; i += layer.size) {
@@ -70,6 +82,7 @@ MapGenerator.prototype = {
     },
 
     interpolateLayerPoints: function(layer, x1, x2, y1, y2) {
+        if(layer.isHeightMap)return;
         x1 = Math.ceil(x1/layer.size)*layer.size;
         y1 = Math.ceil(y1/layer.size)*layer.size;
         x2 = Math.floor(x2/layer.size)*layer.size;

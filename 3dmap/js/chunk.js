@@ -29,6 +29,7 @@ Chunk.prototype = {
         this._initialized = true;
 
         this._graphics = game.make.graphics(0, 0);
+        this._graphics.depth = this._x + this._y;
     },
 
     _initializeTiles: function() {
@@ -40,13 +41,14 @@ Chunk.prototype = {
                 var y = this._y * this._size + j;
 
                 if(!points[i])points[i] = [];
-                points[i][j] = 0;
+
+                var height = 0;
 
                 this.mapGenerator.forEachLayer(function(layer) {
-                    points[i][j] += this.mapGenerator.get(layer, x, y) / layer.scale;
+                    height += this.mapGenerator.get(layer, x, y) / layer.scale;
                 }, this);
 
-                points[i][j] = $V([i, j, Math.round(points[i][j]) + heightOffset]);
+                points[i][j] = $V([i, j, Math.round(height + heightOffset)]);
             }
         }
 
@@ -103,6 +105,7 @@ Chunk.prototype = {
         if(!this._graphics || !this.hidden)return;
         this.render(isoGroup, tileset, minimapTexture);
         isoGroup.add(this._graphics);
+        isoGroup.sort('depth');
         this._graphics.cacheAsBitmap = true;
         this._graphics.visible = true;
         this.hidden = false;
