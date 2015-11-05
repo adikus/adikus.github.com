@@ -9,13 +9,11 @@ Loading.prototype = {
         if(this.settings.fromHeightMap){
             game.load.image('map', 'assets/height_map600.png');
 
-            this.settings.heightOffset = 10;
+            localStorage.landPercentage = $('#land_percentage').val();
         } else {
             localStorage.seed = $('#seed').val();
-            localStorage.offset = $('#height_offset').val();
+            localStorage.landPercentage = $('#land_percentage').val();
             localStorage.chunkCount = $('#chunk_count').val();
-
-            this.settings.heightOffset = parseInt(localStorage.offset);
         }
 
         this.settings.chunkSize = game.device.desktop ? 20 : 10;
@@ -26,7 +24,7 @@ Loading.prototype = {
         game.isoProjector = new IsoProjector(game, light);
 
         if(this.settings.fromHeightMap){
-            game.map = Map.createFromHeightMap(game, this.settings.chunkSize, game.cache.getImage('map'), 50);
+            game.map = Map.createFromHeightMap(game, this.settings.chunkSize, game.cache.getImage('map'), 75);
         }else{
             var count = parseInt(localStorage.chunkCount);
             game.map = new Map(game, this.settings.chunkSize, count, localStorage.seed);
@@ -36,11 +34,15 @@ Loading.prototype = {
             game.map.generator.addLayer(20, 15);
             game.map.generator.addLayer(5, 100);
         }
-        game.map.generator.heightOffset = this.settings.heightOffset;
 
         game.minimap = new Minimap(game);
 
         game.map.generateAll();
+        game.map.generator.normalizeWater(localStorage.landPercentage);
+        if(!this.settings.fromHeightMap){
+            game.map.generator.normalizeHeight();
+            game.map.generator.applyHeightCurve();
+        }
     },
 
     update: function() {

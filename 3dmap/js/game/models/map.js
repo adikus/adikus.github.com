@@ -53,6 +53,8 @@ Map.prototype = {
             this.generator.initLayerPoints(layer, startX, endX, startY, endY);
             this.generator.interpolateLayerPoints(layer, startX + layer.size, endX - layer.size, startY + layer.size, endY - layer.size);
         }, this);
+
+        this.generator.mergeLayers(0, this.chunkCount * this.chunkSize, 0, this.chunkCount * this.chunkSize);
     },
 
     initializeChunks: function(maxCount) {

@@ -27,6 +27,6 @@
 	z-index: 9999;
 }
 
-#height_offset, #chunk_count {
+#land_percentage, #chunk_count {
   width: 50px;
 }

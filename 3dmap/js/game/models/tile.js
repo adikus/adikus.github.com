@@ -15,7 +15,7 @@ Triangle.pointMap = {
     b: [1,2,3]
 };
 
-Triangle.colorMapKeys = [-15, 0, 1, 10, 32, 42, 50, 1000];
+Triangle.colorMapKeys = [-15, 0, 1, 10, 32, 42, 65, 1000];
 Triangle.colorMap = [
     [18, 29, 99], // Deep blue
     [53, 145, 176], // Light blue

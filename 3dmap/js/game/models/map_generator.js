@@ -2,6 +2,13 @@ MapGenerator = function(seed) {
     this._seed = seed;
 
     this._layers = [];
+
+    this._histogram = {};
+
+    this.heightOffset = 0;
+    this.globalScale = 1;
+
+    this._applyHeightCurve = false;
 };
 
 MapGenerator.prototype = {
@@ -28,6 +35,18 @@ MapGenerator.prototype = {
 
     get: function(layer, x, y){
         return layer.map[x] && layer.map[x][y] ? layer.map[x][y] : null;
+    },
+
+    getFinal: function(x, y){
+        var layer = this._layers[0];
+        var height = layer.map[x] && layer.map[x][y] ? (layer.map[x][y] + this.heightOffset)/this.globalScale : null;
+
+        if(this._applyHeightCurve){
+            if(height > 1 && height <= 3)height = Math.sqrt(height);
+            if(height > 3)height = Math.pow(height*0.75/75 + 0.25, 3)*70 + 0.5;
+        }
+
+        return height;
     },
 
     initLayerPoints: function(layer, x1, x2, y1, y2){
@@ -94,8 +113,50 @@ MapGenerator.prototype = {
         for(var j = y1; j <= y2; j++) {
             this._interpolateRow(layer, j, x1, x2, layer.size);
         }
+    },
 
-        //console.log('Interpolated', layer.size, x1/layer.size, x2/layer.size, y1/layer.size, y2/layer.size)
+    mergeLayers: function(x1, x2, y1, y2) {
+        var map = [];
+        for(var i = x1; i <= x2; i++){
+            if(!map[i])map[i] = [];
+            for(var j = y1; j <= y2; j++){
+                var height = 0;
+
+                this.forEachLayer(function(layer) {
+                    height += this.get(layer, i, j) / layer.scale;
+                });
+
+                map[i][j] = height;
+                this._addToHistogram(height);
+            }
+        }
+
+        this._layers = [{size: 1, scale: 1, map: map}];
+    },
+
+    normalizeWater: function(waterPercentage) {
+        var map = this._layers[0].map;
+        var count = map[0].length * map.length;
+        var targetCount = count * (1 - waterPercentage/100);
+        var keys = _(this._histogram).keys().map(function(k){ return parseInt(k); });
+        keys.sort(function(a, b){ return a - b });
+        var i = 0;
+        var sum = 0;
+        while(sum < targetCount){
+            sum += this._histogram[keys[i]];
+            i++;
+        }
+        this.heightOffset = -keys[i];
+    },
+
+    normalizeHeight: function() {
+        var keys = _(this._histogram).keys().map(function(k){ return parseInt(k); });
+        keys.sort(function(a, b){ return a - b });
+        this.globalScale = (_(keys).last() + this.heightOffset)/75;
+    },
+
+    applyHeightCurve: function() {
+        this._applyHeightCurve = true;
     },
 
     _interpolate: function(layer, x1, y1, x2, y2, steps) {
@@ -148,5 +209,11 @@ MapGenerator.prototype = {
             Math.pow((1-t),3)*points[0] + 3*t*Math.pow((1-t),2)*points[2] + 3*(1-t)*Math.pow(t,2)*points[4] + Math.pow(t,3)*points[6],
             Math.pow((1-t),3)*points[1] + 3*t*Math.pow((1-t),2)*points[3] + 3*(1-t)*Math.pow(t,2)*points[5] + Math.pow(t,3)*points[7]
         ];
+    },
+
+    _addToHistogram: function(v) {
+        v = Math.round(v);
+        if(!this._histogram[v])this._histogram[v] = 0;
+        this._histogram[v]++;
     }
 };

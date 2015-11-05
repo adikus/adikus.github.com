@@ -31,13 +31,7 @@ Chunk.prototype = {
 
                 if(!points[i])points[i] = [];
 
-                var height = 0;
-
-                this.mapGenerator.forEachLayer(function(layer) {
-                    height += this.mapGenerator.get(layer, x, y) / layer.scale;
-                }, this);
-
-                points[i][j] = $V([i, j, Math.round(height + this.mapGenerator.heightOffset)]);
+                points[i][j] = $V([i, j, Math.round(this.mapGenerator.getFinal(x, y))]);
             }
         }
 

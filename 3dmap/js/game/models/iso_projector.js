@@ -114,7 +114,7 @@ IsoProjector.prototype = {
         var contourPoints = this._getOffsetPoints(tile, tile.triangles[0], true, false);
         contourPoints.push(this._getOffsetPoints(tile, tile.triangles[1], true, false)[1]);
 
-        graphics.beginFill(Phaser.Color.getColor(255, 255, 255), 0.3);
+        graphics.beginFill(Phaser.Color.getColor(255, 255, 255), 0.2);
         graphics.drawPolygon(contourPoints);
         graphics.endFill();
 
