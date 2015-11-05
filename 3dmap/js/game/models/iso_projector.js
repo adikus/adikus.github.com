@@ -41,6 +41,39 @@ IsoProjector.prototype = {
         return foundTile;
     },
 
+    _drawPath: function(graphics, lineWidth, color, alpha, points) {
+        graphics.lineStyle(lineWidth, color, alpha);
+        graphics.moveTo(_(points).last().x, _(points).last().y);
+        _(points).each(function(p) {
+            graphics.lineTo(p.x, p.y);
+        });
+    },
+
+    _getOffsetPoints: function(tile, triangle, useGlobalPosition, useTerrain) {
+        if(useGlobalPosition === undefined)useGlobalPosition = false;
+        if(useTerrain === undefined)useTerrain = true;
+        var type = useTerrain ? triangle.getTerrainType() : triangle.getType();
+
+        if(!this._triangleData[type]){
+            this._calculateTriangleData(triangle)
+        }
+        var triangleData = this._triangleData[type];
+
+        var x = tile.x*TILE_SIZE;
+        var y = tile.y*TILE_SIZE;
+        var z = triangle.bottom*TILE_HEIGHT;
+        if(useTerrain){
+            z = Math.max(0, z);
+        }
+        if(useGlobalPosition) {
+            x += tile.chunk.x*tile.chunk.size*TILE_SIZE;
+            y += tile.chunk.y*tile.chunk.size*TILE_SIZE;
+        }
+
+        var offset = this.project(x, y, z);
+        return _(triangleData.points).map(function(p) { return p.clone().add(offset.x, offset.y) } );
+    },
+
     draw: function(tile, graphics) {
         if(!this._initialized){
             this._constructProjector();
@@ -50,23 +83,11 @@ IsoProjector.prototype = {
         var contourPoints = [];
 
         _(tile.triangles).each(function(triangle) {
-            var type = triangle.getTerrainType();
+            var offsetPoints = this._getOffsetPoints(tile, triangle);
+            var color = triangle.getColor(triangle.getShade(this.light));
 
-            if(!this._triangleData[type]){
-                this._calculateTriangleData(triangle)
-            }
-            var triangleData = this._triangleData[type];
-
-            var x = tile.x*TILE_SIZE;
-            var y = tile.y*TILE_SIZE;
-            var z = _([triangle.bottom*TILE_HEIGHT, 0]).max();
-
-            var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
-            var offset = game.iso.project(offset3D);
-
-            var offsetPoints = _(triangleData.points).map(function(p) { return new Phaser.Point(offset.x + p.x, offset.y + p.y); });
-            graphics.lineStyle(2, triangle.getColor(triangleData.shade), 1);
-            graphics.beginFill(triangle.getColor(triangleData.shade));
+            graphics.lineStyle(2, color, 1);
+            graphics.beginFill(color);
             graphics.drawPolygon(offsetPoints);
             graphics.endFill();
 
@@ -78,12 +99,8 @@ IsoProjector.prototype = {
 
         }, this);
 
-        graphics.lineStyle(1, Phaser.Color.getColor(0,0,0), 0.3);
-        graphics.moveTo(contourPoints[0].x, contourPoints[0].y);
-        graphics.lineTo(contourPoints[1].x, contourPoints[1].y);
-        graphics.lineTo(contourPoints[2].x, contourPoints[2].y);
-        graphics.lineTo(contourPoints[3].x, contourPoints[3].y);
-        graphics.lineTo(contourPoints[0].x, contourPoints[0].y);
+
+        this._drawPath(graphics, 1, Phaser.Color.getColor(0,0,0), 0.3, contourPoints);
     },
 
     drawOverlay: function(tile, graphics) {
@@ -94,76 +111,19 @@ IsoProjector.prototype = {
 
         graphics.clear();
 
-        var contourPoints = [];
-
-        _(tile.triangles).each(function(triangle) {
-            var type = triangle.getType();
-
-            if(!this._triangleData[type]){
-                this._calculateTriangleData(triangle, false)
-            }
-            var triangleData = this._triangleData[type];
-
-            var chunk = tile.chunk;
-
-            var x = (chunk.x*chunk.size + tile.x)*TILE_SIZE;
-            var y = (chunk.y*chunk.size + tile.y)*TILE_SIZE;
-            var z = triangle.bottom*TILE_HEIGHT;
-
-            var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
-            var offset = game.iso.project(offset3D);
-
-            var offsetPoints = _(triangleData.points).map(function(p) { return new Phaser.Point(offset.x + p.x, offset.y + p.y); });
-
-            if(contourPoints.length < 3){
-                contourPoints = offsetPoints;
-            }else{
-                contourPoints.push(offsetPoints[1]);
-            }
-
-        }, this);
+        var contourPoints = this._getOffsetPoints(tile, tile.triangles[0], true, false);
+        contourPoints.push(this._getOffsetPoints(tile, tile.triangles[1], true, false)[1]);
 
         graphics.beginFill(Phaser.Color.getColor(255, 255, 255), 0.3);
         graphics.drawPolygon(contourPoints);
         graphics.endFill();
 
         if(tile.bottom < 0){
-            contourPoints = [];
-
-            _(tile.triangles).each(function(triangle) {
-                var type = triangle.getTerrainType();
-
-                if(!this._triangleData[type]){
-                    this._calculateTriangleData(triangle)
-                }
-                var triangleData = this._triangleData[type];
-
-                var chunk = tile.chunk;
-
-                var x = (chunk.x*chunk.size + tile.x)*TILE_SIZE;
-                var y = (chunk.y*chunk.size + tile.y)*TILE_SIZE;
-                var z = _([triangle.bottom*TILE_HEIGHT, 0]).max();
-
-                var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
-                var offset = game.iso.project(offset3D);
-
-                var offsetPoints = _(triangleData.points).map(function(p) { return new Phaser.Point(offset.x + p.x, offset.y + p.y); });
-
-                if(contourPoints.length < 3){
-                    contourPoints = offsetPoints;
-                }else{
-                    contourPoints.push(offsetPoints[1]);
-                }
-
-            }, this);
+            contourPoints = this._getOffsetPoints(tile, tile.triangles[0], true);
+            contourPoints.push(this._getOffsetPoints(tile, tile.triangles[1], true)[1]);
         }
 
-        graphics.lineStyle(2, Phaser.Color.getColor(0,0,0), 0.5);
-        graphics.moveTo(contourPoints[0].x, contourPoints[0].y);
-        graphics.lineTo(contourPoints[1].x, contourPoints[1].y);
-        graphics.lineTo(contourPoints[2].x, contourPoints[2].y);
-        graphics.lineTo(contourPoints[3].x, contourPoints[3].y);
-        graphics.lineTo(contourPoints[0].x, contourPoints[0].y);
+        this._drawPath(graphics, 2, Phaser.Color.getColor(0,0,0), 0.5, contourPoints);
     },
 
     _calculateTriangleData: function(triangle, useTerrain) {
@@ -177,8 +137,7 @@ IsoProjector.prototype = {
         }, this);
 
         this._triangleData[type] = {
-            points: projectedPoints,
-            shade: triangle.getShade(this.light)
+            points: projectedPoints
         };
     },
 
