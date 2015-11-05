@@ -1,15 +1,44 @@
-Tileset = function(game) {
-    this._textures = {};
+IsoProjector = function(game, light) {
     this._triangleData = {};
 
     this.game = game;
+    this.light = light;
 
     this._initialized = false;
 };
 
-Tileset.prototype = {
-    get: function(type) {
-        return this._textures[type];
+IsoProjector.prototype = {
+    project: function(x, y, z) {
+        var point3 = new Phaser.Plugin.Isometric.Point3(x, y, z);
+        return this.game.iso.project(point3);
+    },
+
+    unproject: function(x, y, z) {
+        var point = new Phaser.Point(x, y);
+        return game.iso.unproject(point, undefined, z);
+    },
+
+    terrainUnproject: function(x, y, minZ, maxZ) {
+        if(minZ === undefined)minZ = -50;
+        if(maxZ === undefined)maxZ = 150;
+
+        var foundTile = null;
+        for(var j = maxZ; j > minZ; j--){
+            var point3 = this.unproject(x, y, j*TILE_HEIGHT).multiply(1/TILE_SIZE, 1/TILE_SIZE);
+            var point2 = (new Phaser.Point(point3.x, point3.y)).floor();
+            var chunkXY = point2.clone().multiply(1/this.game.map.chunkSize, 1/this.game.map.chunkSize).floor();
+            var chunk = this.game.map.getChunk(chunkXY.x, chunkXY.y);
+            if(!chunk)continue;
+            chunkXY.multiply(this.game.map.chunkSize, this.game.map.chunkSize);
+            var tileXY = point2.clone().subtract(chunkXY.x, chunkXY.y);
+            var tile = chunk._tiles[tileXY.x] && chunk._tiles[tileXY.x][tileXY.y];
+            if(tile && tile.bottom <= j && tile.top >= j){
+                foundTile = tile;
+                break;
+            }
+        }
+
+        return foundTile;
     },
 
     draw: function(tile, graphics) {
@@ -77,8 +106,8 @@ Tileset.prototype = {
 
             var chunk = tile.chunk;
 
-            var x = (chunk._x*chunk._size + tile.x)*TILE_SIZE;
-            var y = (chunk._y*chunk._size + tile.y)*TILE_SIZE;
+            var x = (chunk.x*chunk.size + tile.x)*TILE_SIZE;
+            var y = (chunk.y*chunk.size + tile.y)*TILE_SIZE;
             var z = triangle.bottom*TILE_HEIGHT;
 
             var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
@@ -111,8 +140,8 @@ Tileset.prototype = {
 
                 var chunk = tile.chunk;
 
-                var x = (chunk._x*chunk._size + tile.x)*TILE_SIZE;
-                var y = (chunk._y*chunk._size + tile.y)*TILE_SIZE;
+                var x = (chunk.x*chunk.size + tile.x)*TILE_SIZE;
+                var y = (chunk.y*chunk.size + tile.y)*TILE_SIZE;
                 var z = _([triangle.bottom*TILE_HEIGHT, 0]).max();
 
                 var offset3D = new Phaser.Plugin.Isometric.Point3(x, y, z);
@@ -149,7 +178,7 @@ Tileset.prototype = {
 
         this._triangleData[type] = {
             points: projectedPoints,
-            shade: triangle.getShade(light)
+            shade: triangle.getShade(this.light)
         };
     },
 
