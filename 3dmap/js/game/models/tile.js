@@ -81,26 +81,34 @@ Triangle.prototype = {
 
         Triangle.heightColorMap[this.top] = color;
 
-        var rgb = _(color).map(function(v) { return v*shade; });
+        var rgb = [color[0]*shade, color[1]*shade, color[2]*shade];
 
         return Phaser.Color.getColor.apply(null, rgb);
     },
 
     getValues: function() {
-        return _(this.points).map(function(p) { return p.elements[2]; });
+        return [this.points[0].elements[2], this.points[1].elements[2], this.points[2].elements[2]];
     },
 
     getTerrainValues: function() {
-        return _(this.getValues()).map(function(p) { return _([p, 0]).max(); });
+        return [Math.max(this.points[0].elements[2], 0), Math.max(this.points[1].elements[2], 0), Math.max(this.points[2].elements[2], 0)];
     },
 
     getNormalizedValues: function() {
-        return _(this.getValues()).map(function(v) { return _([v - this.bottom, 4]).min(); }, this);
+        return [
+            Math.min(this.points[0].elements[2] - this.bottom, 4),
+            Math.min(this.points[1].elements[2] - this.bottom, 4),
+            Math.min(this.points[2].elements[2] - this.bottom, 4)
+        ];
     },
 
     getTerrainNormalizedValues: function() {
-        var min = _([0, this.bottom]).max();
-        return _(this.getTerrainValues()).map(function(v) { return _([v - min, 4]).min(); }, this);
+        var min = Math.max(0, this.bottom);
+        return [
+            Math.min(Math.max(this.points[0].elements[2],0) - min, 4),
+            Math.min(Math.max(this.points[1].elements[2],0) - min, 4),
+            Math.min(Math.max(this.points[2].elements[2],0) - min, 4)
+        ];
     },
 
     getType: function() {
@@ -139,20 +147,35 @@ Tile = function(chunk, p1, p2, p3, p4) {
 
 Tile.prototype = {
     getValues: function() {
-        return _(this.points).map(function(p) { return p.elements[2]; });
+        return [this.points[0].elements[2], this.points[1].elements[2], this.points[2].elements[2], this.points[2].elements[3]];
     },
 
     getTerrainValues: function() {
-        return _(this.getValues()).map(function(p) { return _([p, 0]).max(); });
+        return [
+            Math.max(this.points[0].elements[2], 0),
+            Math.max(this.points[1].elements[2], 0),
+            Math.max(this.points[2].elements[2], 0),
+            Math.max(this.points[3].elements[2], 0)
+        ];
     },
 
     getNormalizedValues: function() {
-        return _(this.getValues()).map(function(v) { return _([v - this.bottom, 4]).min(); }, this);
+        return [
+            Math.min(this.points[0].elements[2] - this.bottom, 4),
+            Math.min(this.points[1].elements[2] - this.bottom, 4),
+            Math.min(this.points[2].elements[2] - this.bottom, 4),
+            Math.min(this.points[3].elements[2] - this.bottom, 4)
+        ];
     },
 
     getTerrainNormalizedValues: function() {
-        var min = _([0, this.bottom]).max();
-        return _(this.getTerrainValues()).map(function(v) { return _([v - min, 4]).min(); }, this);
+        var min = Math.max(0, this.bottom);
+        return [
+            Math.min(Math.max(this.points[0].elements[2],0) - min, 4),
+            Math.min(Math.max(this.points[1].elements[2],0) - min, 4),
+            Math.min(Math.max(this.points[2].elements[2],0) - min, 4),
+            Math.min(Math.max(this.points[3].elements[2],0) - min, 4)
+        ];
     },
 
     getType: function() {
