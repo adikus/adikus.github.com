@@ -80,12 +80,18 @@ Map.prototype = {
         var pointCenter3 = this.game.isoProjector.unproject(pointCenter.x, pointCenter.y, 0).multiply(1/this.chunkSize/TILE_SIZE, 1/this.chunkSize/TILE_SIZE);
 
         if(this._stepsSinceLastRender > 1){
-            var border = this.chunkSize * TILE_SIZE;
-            var borders = [[-2*border, 0], [0, -2.5*border], [border, 0], [0, border]];
-            var corners = _(this.game.cameraManager.getCorners()).map(function(p, i) {
-                return this.game.isoProjector.unproject(p.x, p.y, 0).add(borders[i][0], borders[i][1]);
-            }, this);
-            var bounds = new Phaser.Polygon(corners);
+            var bounds;
+
+            if(this.chunkCount <= 20){
+                bounds = new Phaser.Rectangle(-1000*TILE_SIZE, -1000*TILE_SIZE, (this.chunkSize*this.chunkCount+2000)*TILE_SIZE, (this.chunkSize*this.chunkCount+2000)*TILE_SIZE);
+            } else {
+                var border = this.chunkSize * TILE_SIZE;
+                var borders = [[-2*border, 0], [0, -2.5*border], [border, 0], [0, border]];
+                var corners = _(this.game.cameraManager.getCorners()).map(function(p, i) {
+                    return this.game.isoProjector.unproject(p.x, p.y, 0).add(borders[i][0], borders[i][1]);
+                }, this);
+                bounds = new Phaser.Polygon(corners);
+            }
 
             var toBeShown = null;
             var minD = Infinity;
