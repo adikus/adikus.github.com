@@ -42,17 +42,16 @@ Chunk.prototype = {
         });
     },
 
-    render: function(tileset) {
+    render: function(projector) {
         var game = this._group.game;
 
         this.forEachCoord(function(i, j) {
             var tile = this._tiles[i][j];
 
-            tileset.draw(tile, this._graphics);
+            projector.draw(tile, this._graphics);
         });
 
-        var anchor = new Phaser.Plugin.Isometric.Point3(this.x * this.size * TILE_SIZE, this.y * this.size * TILE_SIZE, 0);
-        var position = game.iso.project(anchor);
+        var position = game.isoProjector.project(this.x * this.size * TILE_SIZE, this.y * this.size * TILE_SIZE, 0);
         this._graphics.x = position.x;
         this._graphics.y = position.y;
     },

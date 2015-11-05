@@ -44,9 +44,10 @@ IsoProjector.prototype = {
     _drawPath: function(graphics, lineWidth, color, alpha, points) {
         graphics.lineStyle(lineWidth, color, alpha);
         graphics.moveTo(_(points).last().x, _(points).last().y);
-        _(points).each(function(p) {
-            graphics.lineTo(p.x, p.y);
-        });
+        graphics.lineTo(points[0].x, points[0].y);
+        graphics.lineTo(points[1].x, points[1].y);
+        graphics.lineTo(points[2].x, points[2].y);
+        graphics.lineTo(points[3].x, points[3].y);
     },
 
     _getOffsetPoints: function(tile, triangle, useGlobalPosition, useTerrain) {
