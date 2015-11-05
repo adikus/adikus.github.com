@@ -55,7 +55,7 @@ IsoProjector.prototype = {
         var type = useTerrain ? triangle.getTerrainType() : triangle.getType();
 
         if(!this._triangleData[type]){
-            this._calculateTriangleData(triangle)
+            this._calculateTriangleData(triangle, useTerrain)
         }
         var triangleData = this._triangleData[type];
 
