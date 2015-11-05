@@ -3,6 +3,8 @@ InputManager = function(game) {
 
     this._setupKeyboardHandler();
     this._setupZoomHandler();
+
+    this._currentZoom = 1;
 };
 
 InputManager.prototype = {
@@ -26,8 +28,12 @@ InputManager.prototype = {
         var mc = new Hammer($('#render')[0]);
         var pinch = new Hammer.Pinch();
         mc.add([pinch]);
+        mc.on("pinchstart", function() {
+            self._currentZoom = 1;
+        });
         mc.on("pinch", function(event) {
-            self._zoomHandler(event.scale);
+            self._zoomHandler(event.scale/self._currentZoom);
+            self._currentZoom = event.scale;
         });
     },
 
