@@ -10,12 +10,12 @@ CameraManager.prototype = {
         var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
 
         var zoom = Phaser.Math.clamp(game.camera.scale.x*scale, 0.4, 3);
-        if(Math.abs(zoom - game.camera.scale.x) < 0.01)return;
+        if(Math.abs(zoom - game.camera.scale.x) > 0.01){
+            game.camera.scale.setTo(zoom);
 
-        game.camera.scale.setTo(zoom);
-
-        game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
-        game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
+            game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
+            game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
+        }
 
         var isoBounds = game.cameraManager.getWorldBounds();
         game.world.setBounds(isoBounds.x, isoBounds.y, isoBounds.width, isoBounds.height);
