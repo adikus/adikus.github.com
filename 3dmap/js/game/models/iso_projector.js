@@ -129,8 +129,6 @@ IsoProjector.prototype = {
             this._initialized = true;
         }
 
-        graphics.clear();
-
         var contourPoints = this._getOffsetPoints(tile, tile.triangles[0], true, false);
         contourPoints.push(this._getOffsetPoints(tile, tile.triangles[1], true, false)[1]);
 

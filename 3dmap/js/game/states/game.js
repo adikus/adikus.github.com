@@ -32,6 +32,7 @@ Game.prototype = {
         var point = game.inputManager.getActivePointerXY();
         this.selectedTile = game.isoProjector.terrainUnproject(point.x, point.y);
         if(this.selectedTile) {
+            this.mapOverlay.clear();
             game.isoProjector.drawOverlay(this.selectedTile, this.mapOverlay);
         }
     },
@@ -42,7 +43,7 @@ Game.prototype = {
         var pos = Math.round(pointer.x) + ", " + Math.round(pointer.y);
         game.debug.text(pos, 2, 45, "#a7aebe");
         if(this.selectedTile){
-            var pos2 = (this.selectedTile.x+this.selectedTile.chunk.x*this.selectedTile.chunk.size) + ", " + (this.selectedTile.y+this.selectedTile.chunk.y*this.selectedTile.chunk.size) + ", " + this.selectedTile.bottom;
+            var pos2 = (this.selectedTile.globalX()) + ", " + (this.selectedTile.globalY()) + ", " + this.selectedTile.bottom;
             game.debug.text(pos2, 2, 60, "#a7aebe");
             game.debug.text(this.selectedTile.triangles[0].getType() + ', ' +this.selectedTile.triangles[1].getType(), 2, 75, "#a7aebe");
         }
@@ -55,8 +56,8 @@ Game.prototype = {
 
         game.isoProjector.rotate(amount);
         game.map.hideAll();
-        game.cameraManager.rotate();
         game.minimap.rotate();
+        game.cameraManager.rotate();
 
         var newCenter = centerTile ? game.isoProjector.project(centerTile.globalX()*TILE_SIZE, centerTile.globalY()*TILE_SIZE, centerTile.bottom*TILE_HEIGHT) : game.isoProjector.project(center3.x, center3.y, 0);
         game.cameraManager.centerAt(newCenter);

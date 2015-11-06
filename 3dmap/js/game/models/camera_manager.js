@@ -18,6 +18,7 @@ CameraManager.prototype = {
     },
 
     centerAt: function(point) {
+        this._setCameraBounds();
         this.game.camera.x = point.x*game.camera.scale.x - game.camera.view.halfWidth;
         this.game.camera.y = point.y*game.camera.scale.y - game.camera.view.halfHeight;
     },
@@ -68,8 +69,7 @@ CameraManager.prototype = {
             game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
             game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
 
-            var isoBounds = game.cameraManager.getWorldBounds();
-            game.world.setBounds(isoBounds.x, isoBounds.y, isoBounds.width, isoBounds.height);
+            this._setCameraBounds();
 
             this._zoomDirty = false;
         }
@@ -77,7 +77,7 @@ CameraManager.prototype = {
 
     rotate: function() {
         this._calcWorldBounds();
-        this.zoom(1);
+        this._setCameraBounds();
     },
 
     containsChunk: function(chunk) {
@@ -109,5 +109,10 @@ CameraManager.prototype = {
         var maxY = _(corners).chain().map(function(p){ return p.y; }).max().value();
 
         this._worldBounds = {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+    },
+
+    _setCameraBounds: function() {
+        var isoBounds = this.getWorldBounds();
+        game.world.setBounds(isoBounds.x, isoBounds.y, isoBounds.width, isoBounds.height);
     }
 };
