@@ -33,21 +33,23 @@
     <script src="js/game.js"></script>
   </head>
   <body>
-    <div class="container-fluid">
+    <div class="container-fluid" id="main_container">
       <div id="render">
-        <div class="start">
-          <label for="island" id="island_label">Island?</label>
-          <input type="checkbox" id="island"/>
-          <input type="text" id="seed"/>
-          <input type="text" id="chunk_count"/>
-          <input type="text" id="land_percentage"/>
-          <button id="start" class="start-button btn btn-primary">Random</button>
-          <br>
-          <button id="start_height_map" class="pull-right start-button btn btn-primary">From height map</button>
+        <div class="ui">
+          <button id="fullscreen" class="btn btn-primary">Fullscreen</button>
+          <div class="start">
+            <label for="island" id="island_label">Island?</label>
+            <input type="checkbox" id="island"/>
+            <input type="text" id="seed"/>
+            <input type="text" id="chunk_count"/>
+            <input type="text" id="land_percentage"/>
+            <button id="start" class="start-button btn btn-primary">Random</button>
+            <br>
+            <button id="start_height_map" class="pull-right start-button btn btn-primary">From height map</button>
+          </div>
         </div>
       </div>
       <div id="version"></div>
-      <button id="fullscreen" class="btn btn-primary">Fullscreen</button>
     </div>
    </body>
 </html>

@@ -22,12 +22,11 @@
 
 .start {
 	position: absolute;
-	top: 25px;
-	right: 25px;
+	top: 100px;
+	right: 100px;
 	z-index: 9999;
 }
-
-label#island_label {
+.start label {
 	color: #fff;
 	font-weight: bold;
 	font-size: 1em;

@@ -9,14 +9,13 @@ Minimap = function(game) {
 
     this.sprite.anchor.setTo(0.5);
     this.sprite.fixedToCamera = true;
-    this.sprite.cameraOffset.setTo(game.camera.width - size*this.scale/2, size*this.scale/2);
     this.sprite.scale.setTo(this.scale);
 
     this.overlay.fixedToCamera = true;
-    this.overlay.cameraOffset.setTo(game.camera.width - size*this.scale/2, size*this.scale/2);
     this.overlay.scale.setTo(this.scale);
 
     this.rotate();
+    this.reposition(game.camera.width);
 
     // TODO: minimapOverlay.mask
 };
@@ -49,6 +48,13 @@ Minimap.prototype = {
         _(corners).each(function(c) {
             this.overlay.lineTo(c.x/TILE_SIZE - halfSize, c.y/TILE_SIZE - halfSize);
         }, this);
+    },
+
+    reposition: function(width) {
+        var size = game.map.chunkCount * game.map.chunkSize;
+
+        this.sprite.cameraOffset.setTo(width - size*this.scale/2, size*this.scale/2);
+        this.overlay.cameraOffset.setTo(width - size*this.scale/2, size*this.scale/2);
     },
 
     rotate: function() {

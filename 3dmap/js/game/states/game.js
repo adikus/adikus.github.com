@@ -20,6 +20,10 @@ Game.prototype = {
         game.cameraManager.centerAt(game.isoProjector.project(center, center, 0));
 
         this.mapOverlay = game.add.graphics(0, 0);
+
+        game.scale.onFullScreenChange.add(function(scale){
+            game.minimap.reposition(scale.width);
+        });
     },
 
     update: function() {
