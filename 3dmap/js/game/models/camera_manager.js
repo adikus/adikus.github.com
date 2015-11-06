@@ -10,6 +10,7 @@ CameraManager.prototype = {
         var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
 
         var zoom = Phaser.Math.clamp(game.camera.scale.x*scale, 0.4, 3);
+        if(Math.abs(zoom - game.camera.scale.x) < 0.01)return;
 
         game.camera.scale.setTo(zoom);
 

@@ -86,7 +86,7 @@ Map.prototype = {
             pointCenter3 = this.game.isoProjector.unproject(pointCenter.x, pointCenter.y, 0).multiply(1 / this.chunkSize / TILE_SIZE, 1 / this.chunkSize / TILE_SIZE);
         }
 
-        if (this._stepsSinceLastRender > 1) {
+        if (this._stepsSinceLastRender++ > 1) {
             var toBeShown = null;
             var minD = Infinity;
 
@@ -95,7 +95,7 @@ Map.prototype = {
                 if(chunk._dirty)chunk.hide();
                 if(!chunk.hidden && this.chunkCount <= 20)return;
 
-                if(game.cameraManager.containsChunk(chunk)){
+                if(this._stepsSinceLastRender > 10 || game.cameraManager.containsChunk(chunk)){
                     var d = Phaser.Math.distanceSq(pointCenter3.x, pointCenter3.y, i, j);
                     if(d < minD){
                         minD = d;
@@ -106,11 +106,8 @@ Map.prototype = {
 
             if (toBeShown) {
                 toBeShown.show();
+                this._stepsSinceLastRender = 0;
             }
-
-            this._stepsSinceLastRender = 0;
-        } else {
-            this._stepsSinceLastRender++;
         }
     },
 
