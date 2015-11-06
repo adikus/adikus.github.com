@@ -27,7 +27,7 @@ Map.prototype = {
 
         this.forEachChunkCoord(function (i, j) {
             if(!this._chunks[i])this._chunks[i] = [];
-            this._chunks[i][j] = new Chunk(this.generator, this.chunkSize, i, j);
+            this._chunks[i][j] = new Chunk(this.game, this.chunkSize, i, j);
         }, this);
     },
 
@@ -77,49 +77,46 @@ Map.prototype = {
 
     update: function() {
         var pointCenter = this.game.cameraManager.getFocusXY();
-        var pointCenter3 = this.game.isoProjector.unproject(pointCenter.x, pointCenter.y, 0).multiply(1/this.chunkSize/TILE_SIZE, 1/this.chunkSize/TILE_SIZE);
+        var centerTile = this.game.isoProjector.terrainUnproject(pointCenter.x, pointCenter.y);
+        var pointCenter3;
 
-        if(this._stepsSinceLastRender > 1){
-            var bounds;
+        if(centerTile){
+            pointCenter3 = new Phaser.Point(centerTile.chunk.x, centerTile.chunk.y);
+        }else{
+            pointCenter3 = this.game.isoProjector.unproject(pointCenter.x, pointCenter.y, 0).multiply(1 / this.chunkSize / TILE_SIZE, 1 / this.chunkSize / TILE_SIZE);
+        }
 
-            if(this.chunkCount <= 20){
-                bounds = new Phaser.Rectangle(-1000*TILE_SIZE, -1000*TILE_SIZE, (this.chunkSize*this.chunkCount+2000)*TILE_SIZE, (this.chunkSize*this.chunkCount+2000)*TILE_SIZE);
-            } else {
-                var border = this.chunkSize * TILE_SIZE;
-                var borders = [[-2*border, 0], [0, -2.5*border], [border, 0], [0, border]];
-                var corners = _(this.game.cameraManager.getCorners()).map(function(p, i) {
-                    return this.game.isoProjector.unproject(p.x, p.y, 0).add(borders[i][0], borders[i][1]);
-                }, this);
-                bounds = new Phaser.Polygon(corners);
-            }
-
+        if (this._stepsSinceLastRender > 1) {
             var toBeShown = null;
             var minD = Infinity;
 
-            this.forEachChunkCoord(function(i, j){
-                var d = Phaser.Math.distanceSq(pointCenter3.x, pointCenter3.y, i, j);
-                var chunk = this.getChunk(i, j);
-                var x = chunk.x * chunk.size * TILE_SIZE;
-                var y = chunk.y * chunk.size * TILE_SIZE;
-                var z = chunk._tiles[0][0].top;
-                var offset = this.game.isoProjector.project(0, 0, z * TILE_HEIGHT);
-                var offset3 = this.game.isoProjector.unproject(offset.x, offset.y, 0);
-                x += offset3.x;
-                y += offset3.y;
+            this.forEachChunkCoord(function (i, j) {
+                var chunk = game.map.getChunk(i, j);
+                if(chunk._dirty)chunk.hide();
+                if(!chunk.hidden && this.chunkCount <= 20)return;
 
-                if(chunk._graphics && bounds.contains(x, y)){
-                    if(d < minD && chunk.hidden){
+                if(game.cameraManager.containsChunk(chunk)){
+                    var d = Phaser.Math.distanceSq(pointCenter3.x, pointCenter3.y, i, j);
+                    if(d < minD){
                         minD = d;
                         toBeShown = chunk;
                     }
-                }else{
-                    this.getChunk(i, j).hide();
-                }
+                } else chunk.hide();
             });
 
-            if(toBeShown){ toBeShown.show( this.game.isoProjector); }
+            if (toBeShown) {
+                toBeShown.show();
+            }
 
             this._stepsSinceLastRender = 0;
-        }else{ this._stepsSinceLastRender++; }
+        } else {
+            this._stepsSinceLastRender++;
+        }
+    },
+
+    hideAll: function() {
+        this.forEachChunkCoord(function(i, j) {
+            this.getChunk(i, j)._dirty = true;
+        });
     }
 };

@@ -5,6 +5,7 @@ InputManager = function(game) {
     this._setupZoomHandler();
 
     this._currentZoom = 1;
+    this.keys = {};
 };
 
 InputManager.prototype = {
@@ -51,6 +52,11 @@ InputManager.prototype = {
 
     onDrag: function(handler) {
         this._dragCallback = handler;
+    },
+
+    onKeyDown: function(keyCode, handler, ctx) {
+        if(!this.keys[keyCode])this.keys[keyCode] = game.input.keyboard.addKey(keyCode);
+        this.keys[keyCode].onDown.add(handler, ctx);
     },
 
     getActivePointerXY: function() {

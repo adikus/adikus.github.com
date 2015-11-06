@@ -1,5 +1,5 @@
-Chunk = function(mapGenerator, size, x, y) {
-    this.mapGenerator = mapGenerator;
+Chunk = function(game, size, x, y) {
+    this.game = game;
 
     this.x = x;
     this.y = y;
@@ -9,6 +9,8 @@ Chunk = function(mapGenerator, size, x, y) {
 
     this._tiles = [];
     this.hidden = true;
+
+    this._dirty = false;
 };
 
 Chunk.prototype = {
@@ -18,7 +20,6 @@ Chunk.prototype = {
 
         this._group = terrainGroup;
         this._graphics = game.make.graphics(0, 0);
-        this._graphics.depth = this.x + this.y;
     },
 
     _initializeTiles: function() {
@@ -31,7 +32,7 @@ Chunk.prototype = {
 
                 if(!points[i])points[i] = [];
 
-                points[i][j] = $V([i, j, Math.round(this.mapGenerator.getFinal(x, y))]);
+                points[i][j] = $V([i, j, Math.round(this.game.map.generator.getFinal(x, y))]);
             }
         }
 
@@ -42,18 +43,17 @@ Chunk.prototype = {
         });
     },
 
-    render: function(projector) {
-        var game = this._group.game;
-
+    render: function() {
         this.forEachCoord(function(i, j) {
             var tile = this._tiles[i][j];
 
-            projector.draw(tile, this._graphics);
+            this.game.isoProjector.draw(tile, this._graphics);
         });
 
-        var position = game.isoProjector.project(this.x * this.size * TILE_SIZE, this.y * this.size * TILE_SIZE, 0);
+        var position = this.game.isoProjector.project(this.x * this.size * TILE_SIZE, this.y * this.size * TILE_SIZE, 0);
         this._graphics.x = position.x;
         this._graphics.y = position.y;
+        this._graphics.depth = this.game.isoProjector.getDepth(this.x, this.y);
     },
 
     renderToMinimap: function(minimap, immediate){
@@ -75,23 +75,50 @@ Chunk.prototype = {
         this._graphics.clear();
         this._graphics.parent.remove(this._graphics);
         this.hidden = true;
+        this._dirty = false;
     },
 
-    show: function(isoProjector) {
+    show: function() {
         if(!this._graphics || !this.hidden)return;
-        this.render(isoProjector);
+        this.render();
         this._group.add(this._graphics);
         this._group.sort('depth');
         this._graphics.cacheAsBitmap = true;
         this._graphics.visible = true;
         this.hidden = false;
+        this._dirty = false;
     },
 
     forEachCoord: function(call, ctx) {
-        for(var i = 0; i < this.size; i++) {
-            for (var j = 0; j < this.size; j++) {
+        var point1 = new Phaser.Point(0, 0);
+        var point2 = new Phaser.Point(this.size, this.size);
+        point2.rotate(0, 0, -this.game.isoProjector.angle);
+        var offset = (new Phaser.Point(this.size, this.size)).subtract(point2.x,point2.y).multiply(0.5,0.5);
+        point1.add(offset.x, offset.y);
+        point2.add(offset.x, offset.y);
+
+        var xStart = Math.round(point1.x);
+        var xEnd = Math.round(point2.x);
+        var xStep = Math.round((xEnd - xStart)/this.size);
+        var yStart = Math.round(point1.y);
+        var yEnd = Math.round(point2.y);
+        var yStep = Math.round((yEnd - yStart)/this.size);
+
+        if(xStart > xEnd){ xStart--; xEnd--; }
+        if(yStart > yEnd){ yStart--; yEnd--; }
+
+        for(var i = xStart; Math.round(Math.abs(xEnd - i)) > 0; i += xStep) {
+            for(var j = yStart; Math.round(Math.abs(yEnd - j)) > 0; j += yStep) {
                 call.call(ctx || this, i, j);
             }
         }
+    },
+
+    getCorners: function() {
+        var tiles = [this._tiles[0][0], this._tiles[this.size - 1][0], this._tiles[this.size - 1][this.size - 1], this._tiles[0][this.size - 1]];
+
+        return _(tiles).map(function(tile) {
+            return new Phaser.Plugin.Isometric.Point3(tile.globalX(), tile.globalY(), tile.bottom);
+        });
     }
 };

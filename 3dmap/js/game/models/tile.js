@@ -188,5 +188,13 @@ Tile.prototype = {
 
     isBeach: function() {
         return (this.bottom <= 0) && (this.top > 0);
+    },
+
+    globalX: function() {
+        return this.x+this.chunk.x*this.chunk.size;
+    },
+
+    globalY: function() {
+        return this.y+this.chunk.y*this.chunk.size;
     }
 };

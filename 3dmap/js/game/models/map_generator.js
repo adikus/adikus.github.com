@@ -17,7 +17,6 @@ MapGenerator.prototype = {
     },
 
     addIslandLayer: function(mapSize) {
-        console.log(mapSize);
         var template = [
             [-4,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4],
             [-4,-3,-2,-2,-2,-2,-2,-2,-2,-3,-4],

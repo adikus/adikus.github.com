@@ -66,15 +66,39 @@ CameraManager.prototype = {
         ];
     },
 
+    update: function() {
+        this._calcWorldBounds();
+        this.zoom(1);
+    },
+
+    containsChunk: function(chunk) {
+        var bounds = this.getCameraBounds();
+
+        var chunkCorners = chunk.getCorners();
+        for(var i = 0; i < chunkCorners.length; i++){
+            var corner = chunkCorners[i];
+            var point = this.game.isoProjector.project(corner.x * TILE_SIZE, corner.y * TILE_SIZE, corner.z * TILE_HEIGHT);
+            if(bounds.contains(point.x, point.y))return true;
+        }
+
+        return false;
+    },
+
     _calcWorldBounds: function() {
-        var x1 = -0.5 * this.game.map.chunkSize * TILE_SIZE;
-        var x2 = (this.game.map.chunkCount+1) * this.game.map.chunkSize * TILE_SIZE;
+        var x1 = -this.game.map.chunkSize * TILE_SIZE;
+        var x2 = (this.game.map.chunkCount+2) * this.game.map.chunkSize * TILE_SIZE;
 
-        var cornerLeft = this.game.isoProjector.project(x1, x2, 0);
-        var cornerTop = this.game.isoProjector.project(x1, x1, TILE_HEIGHT*100);
-        var cornerRight = this.game.isoProjector.project(x2, x1, 0);
-        var cornerBottom = this.game.isoProjector.project(x2, x2, 0);
+        var corners = [];
+        corners[0] = this.game.isoProjector.project(x1, x2, 0);
+        corners[1] = this.game.isoProjector.project(x1, x1, 0);
+        corners[2] = this.game.isoProjector.project(x2, x1, 0);
+        corners[3] = this.game.isoProjector.project(x2, x2, 0);
 
-        this._worldBounds = {x: cornerLeft.x, y: cornerTop.y, width: cornerRight.x - cornerLeft.x, height: cornerBottom.y - cornerTop.y};
+        var minX = _(corners).chain().map(function(p){ return p.x; }).min().value();
+        var maxX = _(corners).chain().map(function(p){ return p.x; }).max().value();
+        var minY = _(corners).chain().map(function(p){ return p.y; }).min().value();
+        var maxY = _(corners).chain().map(function(p){ return p.y; }).max().value();
+
+        this._worldBounds = {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
     }
 };

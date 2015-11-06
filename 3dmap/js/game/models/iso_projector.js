@@ -5,17 +5,36 @@ IsoProjector = function(game, light) {
     this.light = light;
 
     this._initialized = false;
+
+    this.angle = 0;
 };
 
 IsoProjector.prototype = {
     project: function(x, y, z) {
-        var point3 = new Phaser.Plugin.Isometric.Point3(x, y, z);
+        var point2 = new Phaser.Point(x, y);
+        point2.rotate(0, 0, this.angle);
+        var point3 = new Phaser.Plugin.Isometric.Point3(point2.x, point2.y, z);
         return this.game.iso.project(point3);
     },
 
     unproject: function(x, y, z) {
         var point = new Phaser.Point(x, y);
-        return game.iso.unproject(point, undefined, z);
+        var point3 = game.iso.unproject(point, undefined, z);
+        var point2 = new Phaser.Point(point3.x, point3.y);
+        point2.rotate(0, 0, -this.angle);
+        return point2;
+    },
+
+    getDepth: function(x, y) {
+        var point2 = new Phaser.Point(x, y);
+        point2.rotate(0, 0, this.angle);
+        return point2.x + point2.y;
+    },
+
+    rotate: function(amount) {
+        this.angle += amount;
+        this._constructProjector();
+        this._triangleData = {};
     },
 
     terrainUnproject: function(x, y, minZ, maxZ) {
@@ -155,8 +174,7 @@ IsoProjector.prototype = {
         for(var i = 0; i <= 4; i++){
             for(var j = 0; j < 4; j++){
                 var point2 = corners[j];
-                var point3 = new Phaser.Plugin.Isometric.Point3(point2.x * TILE_SIZE, point2.y * TILE_SIZE, i * TILE_HEIGHT);
-                this.projector[j][i] = this.game.iso.project(point3);
+                this.projector[j][i] = this.project(point2.x * TILE_SIZE, point2.y * TILE_SIZE, i * TILE_HEIGHT);
             }
         }
     }
