@@ -178,9 +178,19 @@ MapGenerator.prototype = {
     },
 
     normalizeHeight: function() {
-        var keys = _(this._histogram).keys().map(function(k){ return parseInt(k); });
-        keys.sort(function(a, b){ return a - b });
-        this.globalScale = (_(keys).last() + this.heightOffset)/75;
+        var aboveSeeCount = 0;
+        var sum = _(this._histogram).reduce(function(sum, count, height) {
+            height = parseInt(height);
+            if(height - this.heightOffset > 0){
+                sum += count*(height - this.heightOffset);
+                aboveSeeCount += count;
+            }
+
+            return sum;
+        }, 0, this);
+
+        var meanHeight = sum/aboveSeeCount + this.heightOffset;
+        this.globalScale = meanHeight/65;
     },
 
     applyHeightCurve: function() {
