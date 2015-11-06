@@ -16,6 +16,34 @@ MapGenerator.prototype = {
         this._layers.push({size: size, scale: scale, map: [], interpolated: [], startPoint: null})
     },
 
+    addIslandLayer: function(mapSize) {
+        console.log(mapSize);
+        var template = [
+            [-4,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4],
+            [-4,-3,-2,-2,-2,-2,-2,-2,-2,-3,-4],
+            [-4,-2,-1, 0, 0, 0, 0, 0,-1,-2,-4],
+            [-4,-2, 0, 0, 1, 1, 1, 0, 0,-2,-4],
+            [-4,-2, 0, 1, 1, 1, 1, 1, 0,-2,-4],
+            [-4,-2, 0, 1, 1, 1, 1, 1, 0,-2,-4],
+            [-4,-2, 0, 1, 1, 1, 1, 1, 0,-2,-4],
+            [-4,-2, 0, 0, 1, 1, 1, 0, 0,-2,-4],
+            [-4,-2,-1, 0, 0, 0, 0, 0,-1,-2,-4],
+            [-4,-3,-2,-2,-2,-2,-2,-2,-2,-3,-4],
+            [-4,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4]
+        ];
+        var map = [];
+        var s = Math.round(mapSize/8);
+        for(var i = 0; i < template.length; i++){
+            for(var j = 0; j < template.length; j++){
+                if(!map[i*s-s])map[i*s-s] = [];
+                map[i*s-s][j*s-s] = template[i][j]*25;
+            }
+        }
+        this._layers.push({
+            size: s, scale: 1, map: map
+        });
+    },
+
     fromHeightMap: function(heightMap, scale) {
         var layer = {isHeightMap: true, scale: 1, map: []};
         for(var i = 0; i < heightMap.width; i++){
@@ -34,7 +62,7 @@ MapGenerator.prototype = {
     },
 
     get: function(layer, x, y){
-        return layer.map[x] && layer.map[x][y] ? layer.map[x][y] : null;
+        return layer.map[x] && layer.map[x][y] !== undefined ? layer.map[x][y] : null;
     },
 
     getFinal: function(x, y){
@@ -70,7 +98,7 @@ MapGenerator.prototype = {
                     if(layer.startPoint === null){
                         layer.startPoint = [i, j];
                     }else{
-                        throw 'No anchor point at (' + i + ', ' + j + ')';
+                        throw 'No anchor point at (' + i + ', ' + j + ') for layer ' + layer.size + ', ' + layer.scale;
                     }
                 }
 

@@ -14,6 +14,7 @@ Loading.prototype = {
             localStorage.seed = $('#seed').val();
             localStorage.landPercentage = $('#land_percentage').val();
             localStorage.chunkCount = $('#chunk_count').val();
+            localStorage.isIsland = $('#island').is(':checked') ? 'true' : 'false';
         }
 
         this.settings.chunkSize = game.device.desktop ? 20 : 10;
@@ -37,7 +38,12 @@ Loading.prototype = {
 
         game.minimap = new Minimap(game);
 
+        if(localStorage.isIsland == 'true' && !this.settings.fromHeightMap) {
+            game.map.generator.addIslandLayer(game.map.chunkSize * game.map.chunkCount);
+        }
+
         game.map.generateAll();
+
         game.map.generator.normalizeWater(localStorage.landPercentage);
         if(!this.settings.fromHeightMap){
             game.map.generator.normalizeHeight();
