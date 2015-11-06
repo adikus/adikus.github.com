@@ -24,6 +24,7 @@ Game.prototype = {
 
     update: function() {
         game.inputManager.update();
+        game.cameraManager.update();
 
         game.map.update();
         game.minimap.update();
@@ -54,7 +55,7 @@ Game.prototype = {
 
         game.isoProjector.rotate(amount);
         game.map.hideAll();
-        game.cameraManager.update();
+        game.cameraManager.rotate();
         game.minimap.rotate();
 
         var newCenter = centerTile ? game.isoProjector.project(centerTile.globalX()*TILE_SIZE, centerTile.globalY()*TILE_SIZE, centerTile.bottom*TILE_HEIGHT) : game.isoProjector.project(center3.x, center3.y, 0);

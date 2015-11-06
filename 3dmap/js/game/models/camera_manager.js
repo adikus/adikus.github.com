@@ -2,23 +2,14 @@ CameraManager = function(game) {
     this.game = game;
 
     this._calcWorldBounds();
+    this._targetZoom = 1;
+    this._zoomDirty = false;
 };
 
 CameraManager.prototype = {
     zoom: function(scale) {
-        var x = (game.camera.view.x + game.camera.view.halfWidth)/game.camera.scale.x;
-        var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
-
-        var zoom = Phaser.Math.clamp(game.camera.scale.x*scale, 0.4, 3);
-        if(Math.abs(zoom - game.camera.scale.x) > 0.01){
-            game.camera.scale.setTo(zoom);
-
-            game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
-            game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
-        }
-
-        var isoBounds = game.cameraManager.getWorldBounds();
-        game.world.setBounds(isoBounds.x, isoBounds.y, isoBounds.width, isoBounds.height);
+        game.cameraManager._targetZoom = Phaser.Math.clamp(game.cameraManager._targetZoom*scale, 0.4, 3);
+        game.cameraManager._zoomDirty = true;
     },
 
     move: function(x, y) {
@@ -68,6 +59,23 @@ CameraManager.prototype = {
     },
 
     update: function() {
+        if(this._zoomDirty){
+            var x = (game.camera.view.x + game.camera.view.halfWidth)/game.camera.scale.x;
+            var y = (game.camera.view.y + game.camera.view.halfHeight)/game.camera.scale.y;
+
+            game.camera.scale.setTo(this._targetZoom);
+
+            game.camera.x = x*game.camera.scale.x - game.camera.view.halfWidth;
+            game.camera.y = y*game.camera.scale.y - game.camera.view.halfHeight;
+
+            var isoBounds = game.cameraManager.getWorldBounds();
+            game.world.setBounds(isoBounds.x, isoBounds.y, isoBounds.width, isoBounds.height);
+
+            this._zoomDirty = false;
+        }
+    },
+
+    rotate: function() {
         this._calcWorldBounds();
         this.zoom(1);
     },
