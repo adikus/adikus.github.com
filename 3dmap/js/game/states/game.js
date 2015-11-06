@@ -3,6 +3,7 @@ Game = function() {};
 Game.prototype = {
     init: function(settings) {
         this.settings = settings;
+        this.groups = settings.groups;
     },
 
     create: function() {
@@ -19,7 +20,7 @@ Game.prototype = {
         var center = game.map.chunkCount * game.map.chunkSize * TILE_SIZE / 2;
         game.cameraManager.centerAt(game.isoProjector.project(center, center, 0));
 
-        this.mapOverlay = game.add.graphics(0, 0);
+        this.mapOverlay = game.add.graphics(0, 0, this.groups.overlay);
 
         game.scale.onFullScreenChange.add(function(scale){
             game.minimap.reposition(scale.width);

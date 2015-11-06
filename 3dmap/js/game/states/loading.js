@@ -24,11 +24,17 @@ Loading.prototype = {
         var light = $V([0,0.5,1]);
         game.isoProjector = new IsoProjector(game, light);
 
+        var terrainGroup = game.add.group();
+        var terrainOverlayGroup = game.add.group();
+        var uiGroup = game.add.group();
+
+        game.map = new Map(game, terrainGroup);
+
         if(this.settings.fromHeightMap){
-            game.map = Map.createFromHeightMap(game, this.settings.chunkSize, game.cache.getImage('map'), 75);
+            game.map.initFromHeightMap(this.settings.chunkSize, game.cache.getImage('map'), 75);
         }else{
             var count = parseInt(localStorage.chunkCount);
-            game.map = new Map(game, this.settings.chunkSize, count, localStorage.seed);
+            game.map.init(this.settings.chunkSize, count, localStorage.seed);
 
             game.map.generator.addLayer(200, 4);
             game.map.generator.addLayer(80, 7);
@@ -36,7 +42,7 @@ Loading.prototype = {
             game.map.generator.addLayer(5, 100);
         }
 
-        game.minimap = new Minimap(game);
+        game.minimap = new Minimap(game, uiGroup);
 
         if(localStorage.isIsland == 'true' && !this.settings.fromHeightMap) {
             game.map.generator.addIslandLayer(game.map.chunkSize * game.map.chunkCount);
@@ -49,6 +55,12 @@ Loading.prototype = {
             game.map.generator.normalizeHeight();
             game.map.generator.applyHeightCurve();
         }
+
+        this.settings.groups = {
+            terrain: terrainGroup,
+            overlay: terrainOverlayGroup,
+            ui: uiGroup
+        };
     },
 
     update: function() {

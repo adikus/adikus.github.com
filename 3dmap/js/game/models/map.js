@@ -1,24 +1,26 @@
-Map = function(game, chunkSize, chunkCount, seed) {
-    this.generator = new MapGenerator(seed);
+Map = function(game, group) {
     this.game = game;
-    this.terrainGroup = game.add.group();
-
-    this._createChunks(chunkSize, chunkCount);
+    this.terrainGroup = group;
     this.initializedChunks = 0;
     this._stepsSinceLastRender = Infinity;
 };
 
-Map.createFromHeightMap = function(game, chunkCount, image, scale) {
-    var map = new Map(game, chunkCount, Math.floor((image.width - 1) / chunkCount));
-    var bmd = game.make.bitmapData(image.width, image.height);
-    bmd.draw(image, 0, 0);
-    bmd.update();
-    map.generator.fromHeightMap(bmd, scale);
-
-    return map;
-};
-
 Map.prototype = {
+    init: function(chunkSize, chunkCount, seed){
+        this.generator = new MapGenerator(seed);
+        this._createChunks(chunkSize, chunkCount);
+    },
+
+    initFromHeightMap: function(chunkCount, image, scale) {
+        this.generator = new MapGenerator('-');
+        this._createChunks(Math.floor((image.width - 1) / chunkCount), chunkCount);
+
+        var bmd = game.make.bitmapData(image.width, image.height);
+        bmd.draw(image, 0, 0);
+        bmd.update();
+        this.generator.fromHeightMap(bmd, scale);
+    },
+
     _createChunks: function(chunkSize, chunkCount) {
         this._chunks = [];
 
