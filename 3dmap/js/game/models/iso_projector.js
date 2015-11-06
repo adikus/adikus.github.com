@@ -94,7 +94,44 @@ IsoProjector.prototype = {
         return _(triangleData.points).map(function(p) { return p.clone().add(offset.x, offset.y) } );
     },
 
-    draw: function(tile, graphics) {
+    _getBottomPoints: function(tile, bottom) {
+        var indexes = [tile.triangles[0].pointMap[0],tile.triangles[0].pointMap[1],tile.triangles[0].pointMap[2],tile.triangles[1].pointMap[1]];
+        var points = [this.projector[indexes[0]][0],this.projector[indexes[1]][0],this.projector[indexes[2]][0],this.projector[indexes[3]][0]];
+
+        var x = tile.x*TILE_SIZE;
+        var y = tile.y*TILE_SIZE;
+        var z = bottom*TILE_HEIGHT;
+
+        var offset = this.project(x, y, z);
+        return _(points).map(function(p) { return p.clone().add(offset.x, offset.y) } );
+    },
+
+    _drawTileBottom: function(graphics, tile, contourPoints, bottom) {
+        var bottomPoints = this._getBottomPoints(tile, bottom);
+        var depths = _(bottomPoints).map(function(p, i) { return {i: i, y: p.y}; });
+        depths.sort(function(a, b) { return b.y - a.y });
+
+        graphics.lineStyle(0);
+        graphics.beginFill(tile.top > 60 ? Phaser.Color.getColor(36, 36, 36) : tile.triangles[0].getColor(0.3));
+        graphics.drawPolygon([contourPoints[depths[0].i], contourPoints[depths[1].i], bottomPoints[depths[1].i], bottomPoints[depths[0].i]]);
+        graphics.drawPolygon([contourPoints[depths[0].i], contourPoints[depths[2].i], bottomPoints[depths[2].i], bottomPoints[depths[0].i]]);
+        graphics.endFill();
+    },
+
+    _drawTileUnderwater: function(graphics, tile, contourPoints) {
+        var bottomPoints = this._getOffsetPoints(tile, tile.triangles[0], false, false);
+        bottomPoints.push(this._getOffsetPoints(tile, tile.triangles[1], false, false)[1]);
+        var depths = _(contourPoints).map(function(p, i) { return {i: i, y: p.y}; });
+        depths.sort(function(a, b) { return b.y - a.y });
+
+        graphics.lineStyle(0);
+        graphics.beginFill(tile.triangles[0].getColor(0.3));
+        graphics.drawPolygon([contourPoints[depths[0].i], contourPoints[depths[1].i], bottomPoints[depths[1].i], bottomPoints[depths[0].i]]);
+        graphics.drawPolygon([contourPoints[depths[0].i], contourPoints[depths[2].i], bottomPoints[depths[2].i], bottomPoints[depths[0].i]]);
+        graphics.endFill();
+    },
+
+    draw: function(tile, graphics, isEdge) {
         if(!this._initialized){
             this._constructProjector();
             this._initialized = true;
@@ -111,6 +148,7 @@ IsoProjector.prototype = {
             graphics.drawPolygon(offsetPoints);
             graphics.endFill();
 
+
             if(contourPoints.length < 3){
                 contourPoints = offsetPoints;
             }else{
@@ -119,6 +157,12 @@ IsoProjector.prototype = {
 
         }, this);
 
+        if(isEdge && (tile.chunk.size - 1 == tile.x || tile.chunk.size - 1 == tile.y || tile.x == 0 || tile.y == 0)){
+            if(tile.top > 0)this._drawTileBottom(graphics, tile, contourPoints, 0);
+            else this._drawTileUnderwater(graphics, tile, contourPoints);
+        }else if(tile.top > 0){
+            this._drawTileBottom(graphics, tile, contourPoints, Math.max(tile.bottom - 5, 0));
+        }
 
         this._drawPath(graphics, 1, Phaser.Color.getColor(0,0,0), 0.3, contourPoints);
     },

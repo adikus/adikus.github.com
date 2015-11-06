@@ -50,14 +50,14 @@ Triangle.prototype = {
         if(Triangle.shadeMap[type])return Triangle.shadeMap[type];
         this.initSylvester();
         var shade = Math.min(Math.abs(light.dot(this.plane.normal)/2),1);
-        Triangle.shadeMap[type] = 0.80*shade+0.20;
+        Triangle.shadeMap[type] = 0.50*shade+0.50;
         return Triangle.shadeMap[type];
     },
 
     getWaterShade: function(light) {
         if(Triangle.shadeMap['w'])return Triangle.shadeMap['w'];
         var shade = Math.min(Math.abs(light.dot($V([0,0,1]))/2),1);
-        Triangle.shadeMap['w'] = 0.80*shade+0.20;
+        Triangle.shadeMap['w'] = 0.50*shade+0.50;
         return Triangle.shadeMap['w'];
     },
 

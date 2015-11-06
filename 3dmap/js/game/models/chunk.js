@@ -47,7 +47,8 @@ Chunk.prototype = {
         this.forEachCoord(function(i, j) {
             var tile = this._tiles[i][j];
 
-            this.game.isoProjector.draw(tile, this._graphics);
+            var isEdge = this.game.map.chunkCount - 1 == this.x || this.game.map.chunkCount - 1 == this.y || this.x == 0 || this.y == 0;
+            this.game.isoProjector.draw(tile, this._graphics, isEdge);
         });
 
         var position = this.game.isoProjector.project(this.x * this.size * TILE_SIZE, this.y * this.size * TILE_SIZE, 0);
