@@ -2,7 +2,7 @@ Minimap = function(game, group) {
     this.game = game;
 
     var size = game.map.chunkCount * game.map.chunkSize;
-    this.scale = size > 300 ? 300/size : 1;
+    this.scale = 300/size;
     this.texture = game.make.bitmapData(size, size);
     this.sprite = game.add.sprite(0, 0, this.texture, null, group);
     this.overlay = game.add.graphics(0, 0, group);
@@ -41,7 +41,8 @@ Minimap.prototype = {
 
         var chunkSize = this.game.map.chunkSize;
         this.game.map.forEachChunkCoord(function(i, j) {
-            if(this.game.map.getChunk(i, j).hidden){
+            var chunk = this.game.map.getChunk(i, j);
+            if(chunk.hidden && !chunk.cached){
                 this.overlay.beginFill(Phaser.Color.getColor(0,0,0), 0.3);
                 this.overlay.drawRect(i*chunkSize - halfSize, j*chunkSize - halfSize, chunkSize, chunkSize);
                 this.overlay.endFill();

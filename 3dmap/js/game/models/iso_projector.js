@@ -60,6 +60,13 @@ IsoProjector.prototype = {
         return foundTile;
     },
 
+    getAngleIndex: function() {
+        var index = Math.round(this.angle/Math.PI*2 % 4);
+        if(index < 0)index += 4;
+        if(index > 3)index -= 4;
+        return index;
+    },
+
     _drawPath: function(graphics, lineWidth, color, alpha, points) {
         graphics.lineStyle(lineWidth, color, alpha);
         graphics.moveTo(_(points).last().x, _(points).last().y);

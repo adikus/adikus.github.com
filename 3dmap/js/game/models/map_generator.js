@@ -173,10 +173,10 @@ MapGenerator.prototype = {
             sum += this._histogram[keys[i]];
             i++;
         }
-        this.heightOffset = -keys[i];
+        this.heightOffset = -keys[i]-1;
     },
 
-    normalizeHeight: function() {
+    normalizeHeight: function(scale) {
         var aboveSeeCount = 0;
         var sum = _(this._histogram).reduce(function(sum, count, height) {
             height = parseInt(height);
@@ -189,7 +189,7 @@ MapGenerator.prototype = {
         }, 0, this);
 
         var meanHeight = sum/aboveSeeCount + this.heightOffset;
-        this.globalScale = meanHeight/65;
+        this.globalScale = meanHeight/65/Math.sqrt(scale);
     },
 
     applyHeightCurve: function() {

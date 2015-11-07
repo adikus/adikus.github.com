@@ -60,9 +60,9 @@ Game.prototype = {
         var center3 = game.isoProjector.unproject(center2.x, center2.y, 0);
 
         game.isoProjector.rotate(amount);
-        game.map.hideAll();
         game.minimap.rotate();
         game.cameraManager.rotate();
+        game.map.rotate();
 
         var newCenter = centerTile ? game.isoProjector.project(centerTile.globalX()*TILE_SIZE, centerTile.globalY()*TILE_SIZE, centerTile.bottom*TILE_HEIGHT) : game.isoProjector.project(center3.x, center3.y, 0);
         game.cameraManager.centerAt(newCenter);

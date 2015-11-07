@@ -81,9 +81,15 @@ CameraManager.prototype = {
     },
 
     containsChunk: function(chunk) {
-        var bounds = this.getCameraBounds();
+        var border = 0.1;
+        var bounds = new Phaser.Rectangle(
+            (game.camera.x - game.camera.width*border)/game.world.scale.x,
+            (game.camera.y - game.camera.height*border)/game.world.scale.y,
+            game.camera.width/game.world.scale.x*(1+2*border),
+            game.camera.height/game.world.scale.y*(1+2*border)
+        );
 
-        var chunkCorners = chunk.getCorners();
+        var chunkCorners = chunk.getControlPoints();
         for(var i = 0; i < chunkCorners.length; i++){
             var corner = chunkCorners[i];
             var point = this.game.isoProjector.project(corner.x * TILE_SIZE, corner.y * TILE_SIZE, corner.z * TILE_HEIGHT);

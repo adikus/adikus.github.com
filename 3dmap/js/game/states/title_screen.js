@@ -4,12 +4,12 @@ TitleScreen.prototype = {
     preload: function() {
         var $seed = $('#seed');
         var $landPercentage = $('#land_percentage');
-        var $chunkCount = $('#chunk_count');
+        var $mapSize = $('#map_size');
 
 
         if($seed.val() == '')$seed.val(localStorage.seed || '123456789');
         if($landPercentage.val() == '')$landPercentage.val(localStorage.landPercentage || '75');
-        if($chunkCount.val() == '')$chunkCount.val(localStorage.chunkCount || '20');
+        if($mapSize.val() == '')$mapSize.val(localStorage.mapSize || '400');
         $('#island').prop('checked', localStorage.isIsland == 'true');
     },
 

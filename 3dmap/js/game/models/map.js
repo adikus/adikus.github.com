@@ -3,6 +3,8 @@ Map = function(game, group) {
     this.terrainGroup = group;
     this.initializedChunks = 0;
     this._stepsSinceLastRender = Infinity;
+    this.allowPreload = false;
+    this.allowCaching = false;
 };
 
 Map.prototype = {
@@ -30,6 +32,7 @@ Map.prototype = {
         this.forEachChunkCoord(function (i, j) {
             if(!this._chunks[i])this._chunks[i] = [];
             this._chunks[i][j] = new Chunk(this.game, this.chunkSize, i, j);
+            this._chunks[i][j].allowCaching = this.allowCaching;
         }, this);
     },
 
@@ -66,7 +69,7 @@ Map.prototype = {
                 var chunk = this.getChunk(i, j);
                 if (!chunk.initialized) {
                     chunk.initialize(this.terrainGroup);
-                    chunk.renderToMinimap(this.game.minimap, this.initializedChunks - count == maxCount);
+                    chunk.renderToMinimap(this.game.minimap, this.initializedChunks - count >= maxCount);
                     this.initializedChunks++;
                 }
                 if (this.initializedChunks - count > maxCount)break;
@@ -74,7 +77,7 @@ Map.prototype = {
             if(this.initializedChunks - count > maxCount)break;
         }
 
-        return this.initializedChunks == this.chunkCount * this.chunkCount;
+        return this.initializedChunks >= this.chunkCount * this.chunkCount;
     },
 
     update: function() {
@@ -95,15 +98,25 @@ Map.prototype = {
             this.forEachChunkCoord(function (i, j) {
                 var chunk = game.map.getChunk(i, j);
                 if(chunk._dirty)chunk.hide();
-                if(!chunk.hidden && this.chunkCount <= 20)return;
 
-                if(this._stepsSinceLastRender > 10 || game.cameraManager.containsChunk(chunk)){
-                    var d = Phaser.Math.distanceSq(pointCenter3.x, pointCenter3.y, i, j);
+                var d = Phaser.Math.distanceSq(pointCenter3.x, pointCenter3.y, i, j);
+                var onCamera = game.cameraManager.containsChunk(chunk);
+                if(onCamera){
                     if(chunk.hidden && d < minD){
+                        if(chunk.cached){
+                            chunk.show();
+                        }else{
+                            minD = d;
+                            toBeShown = chunk;
+                        }
+                    }
+                } else {
+                    if(this.allowCaching && !chunk.cached && this._stepsSinceLastRender > 10 && d < minD){
                         minD = d;
                         toBeShown = chunk;
                     }
-                } else chunk.hide();
+                    chunk.hide();
+                }
             });
 
             if (toBeShown) {
@@ -113,9 +126,12 @@ Map.prototype = {
         }
     },
 
-    hideAll: function() {
-        this.forEachChunkCoord(function(i, j) {
-            this.getChunk(i, j)._dirty = true;
+    rotate: function(){
+        game.map.forEachChunkCoord(function (i, j) {
+            var chunk = game.map.getChunk(i, j);
+            chunk.rotate();
+            if(this.allowPreload)chunk.show();
         });
+        game.map.terrainGroup.sort('depth');
     }
 };
