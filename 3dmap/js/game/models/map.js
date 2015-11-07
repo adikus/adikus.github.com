@@ -99,7 +99,7 @@ Map.prototype = {
 
                 if(this._stepsSinceLastRender > 10 || game.cameraManager.containsChunk(chunk)){
                     var d = Phaser.Math.distanceSq(pointCenter3.x, pointCenter3.y, i, j);
-                    if(d < minD){
+                    if(chunk.hidden && d < minD){
                         minD = d;
                         toBeShown = chunk;
                     }
