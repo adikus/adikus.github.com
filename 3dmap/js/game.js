@@ -1,9 +1,9 @@
-VERSION = '0.2.10';
+VERSION = '0.2.10-a';
 
-TILE_SIZE = 16;
-TILE_HEIGHT = 8;
+TILE_SIZE = 15;
+TILE_HEIGHT = 5;
 
-ALLOW_PRELOAD = true;
+ALLOW_PRELOAD = false;
 
 DEBUG = false;
 

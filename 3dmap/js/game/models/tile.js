@@ -41,7 +41,8 @@ Triangle.shadeMap = {};
 
 Triangle.prototype = {
     initSylvester: function() {
-        this.plane = $P(this.points[0], this.points[1], this.points[2]);
+        var points = _(this.points).each(function(p) { return $V([p.elements[0]*TILE_SIZE, p.elements[1]*TILE_SIZE, p.elements[2]*TILE_HEIGHT]); });
+        this.plane = $P(points[0], points[1], points[2]);
     },
 
     getShade: function(light) {
