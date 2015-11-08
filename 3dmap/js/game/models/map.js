@@ -28,6 +28,7 @@ Map.prototype = {
 
         this.chunkSize = chunkSize;
         this.chunkCount = chunkCount;
+        this.size = chunkSize*chunkCount;
 
         this.forEachChunkCoord(function (i, j) {
             if(!this._chunks[i])this._chunks[i] = [];
@@ -46,6 +47,14 @@ Map.prototype = {
 
     getChunk: function(x, y){
         return this._chunks[x] && this._chunks[x][y];
+    },
+
+    getTile: function(x, y){
+        var cx = Math.floor(x / this.chunkSize);
+        var cy = Math.floor(y / this.chunkSize);
+        var tx = x % this.chunkSize;
+        var ty = y % this.chunkSize;
+        return this._chunks[cx] && this._chunks[cx][cy] && this._chunks[cx][cy].getTile(tx, ty);
     },
 
     generateAll: function() {

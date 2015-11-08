@@ -22,6 +22,10 @@ Chunk.prototype = {
         this._group = terrainGroup;
     },
 
+    getTile: function(x, y) {
+        return this._tiles[x] && this._tiles[x][y];
+    },
+
     _initializeTiles: function() {
         var points = [];
 

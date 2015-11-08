@@ -148,7 +148,7 @@ Tile = function(chunk, p1, p2, p3, p4) {
 
 Tile.prototype = {
     getValues: function() {
-        return [this.points[0].elements[2], this.points[1].elements[2], this.points[2].elements[2], this.points[2].elements[3]];
+        return [this.points[0].elements[2], this.points[1].elements[2], this.points[2].elements[2], this.points[3].elements[2]];
     },
 
     getTerrainValues: function() {

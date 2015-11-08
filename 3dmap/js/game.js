@@ -1,9 +1,11 @@
-VERSION = '0.2.10-a';
+VERSION = '0.2.11';
 
 TILE_SIZE = 15;
 TILE_HEIGHT = 5;
 
 ALLOW_PRELOAD = false;
+
+Z_COST = 20;
 
 DEBUG = false;
 

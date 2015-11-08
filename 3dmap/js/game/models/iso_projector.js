@@ -174,7 +174,7 @@ IsoProjector.prototype = {
         this._drawPath(graphics, 1, Phaser.Color.getColor(0,0,0), 0.3, contourPoints);
     },
 
-    drawOverlay: function(tile, graphics) {
+    drawOverlay: function(tile, graphics, color) {
         if(!this._initialized){
             this._constructProjector();
             this._initialized = true;
@@ -183,7 +183,8 @@ IsoProjector.prototype = {
         var contourPoints = this._getOffsetPoints(tile, tile.triangles[0], true, false);
         contourPoints.push(this._getOffsetPoints(tile, tile.triangles[1], true, false)[1]);
 
-        graphics.beginFill(Phaser.Color.getColor(255, 255, 255), 0.2);
+        graphics.lineStyle(0);
+        graphics.beginFill(color || Phaser.Color.getColor(255, 255, 255), 0.2);
         graphics.drawPolygon(contourPoints);
         graphics.endFill();
 

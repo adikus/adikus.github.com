@@ -10,16 +10,56 @@ Game.prototype = {
         game.inputManager = new InputManager(game);
         game.cameraManager = new CameraManager(game);
 
+        game.map.easystar = new EasyStar.js();
+        game.map.easystar.setGrid(game.map);
+        game.map.easystar.setIterationsPerCalculation(200);
+        game.map.easystar.enableDiagonals();
+
         game.inputManager.onZoom(game.cameraManager.zoom);
         game.inputManager.onCursorKey(function(x, y) { game.cameraManager.move(x*20, y*-20); });
         game.inputManager.onDrag(function(x, y) { game.cameraManager.move(x, y); });
         game.inputManager.onKeyDown(Phaser.KeyCode.Q, function() { this.rotate(Math.PI/2); }, this);
         game.inputManager.onKeyDown(Phaser.KeyCode.E, function() { this.rotate(-Math.PI/2); }, this);
+        game.inputManager.onKeyDown(Phaser.KeyCode.O, function() {
+            this.pathStart = this.selectedTile;
+            game.isoProjector.drawOverlay(this.pathStart, game.map.pathOverlay, Phaser.Color.getColor(0, 255, 255));
+        }, this);
+        game.inputManager.onKeyDown(Phaser.KeyCode.P, function() {
+            this.pathEnd = this.selectedTile;
+            var self = this;
+            game.map.easystar.findPath(this.pathStart.globalX(), this.pathStart.globalY(), this.pathEnd.globalX(), this.pathEnd.globalY(), true, function(path){
+                //console.log(path);
+                game.map.pathOverlay.clear();
+                _(path).each(function(point) {
+                    var tile = game.map.getTile(point.x, point.y);
+                    game.isoProjector.drawOverlay(tile, game.map.pathOverlay, Phaser.Color.getColor(255, 0, 0));
+                });
+                var point = path[Math.floor(path.length/2)];
+                game.map.easystar.findPath(self.pathStart.globalX(), self.pathStart.globalY(), point.x, point.y, false, function(path){
+                    //console.log(path);
+                    game.map.pathOverlay.clear();
+                    _(path).each(function(point) {
+                        var tile = game.map.getTile(point.x, point.y);
+                        game.isoProjector.drawOverlay(tile, game.map.pathOverlay, Phaser.Color.getColor(0, 255, 0));
+                    });
+                });
+                game.map.easystar.findPath(point.x, point.y, self.pathEnd.globalX(), self.pathEnd.globalY(), false, function(path){
+                    //console.log(path);
+                    game.map.pathOverlay.clear();
+                    _(path).each(function(point) {
+                        var tile = game.map.getTile(point.x, point.y);
+                        game.isoProjector.drawOverlay(tile, game.map.pathOverlay, Phaser.Color.getColor(0, 0, 255));
+                    });
+                });
+            });
+            console.log('start');
+        }, this);
 
         game.cameraManager.zoom(0.75);
         var center = game.map.chunkCount * game.map.chunkSize * TILE_SIZE / 2;
         game.cameraManager.centerAt(game.isoProjector.project(center, center, 0));
 
+        game.map.pathOverlay = game.add.graphics(0, 0, this.groups.overlay);
         this.mapOverlay = game.add.graphics(0, 0, this.groups.overlay);
 
         game.scale.onFullScreenChange.add(function(scale){
@@ -28,6 +68,7 @@ Game.prototype = {
     },
 
     update: function() {
+        game.map.easystar.calculate();
         game.inputManager.update();
         game.cameraManager.update();
 
