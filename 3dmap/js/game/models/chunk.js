@@ -66,7 +66,10 @@ Chunk.prototype = {
                 var tile = this._tiles[i][j];
 
                 var isEdge = this.game.map.chunkCount - 1 == this.x || this.game.map.chunkCount - 1 == this.y || this.x == 0 || this.y == 0;
-                this.game.isoProjector.draw(tile, this._graphics, isEdge);
+                timestat('draw', function() {
+                    this.game.isoProjector.draw(tile, this._graphics, isEdge, this._dirty);
+                }, this);
+
             });
 
             var position = this.game.isoProjector.project(this.x * this.size * TILE_SIZE, this.y * this.size * TILE_SIZE, 0);
@@ -88,6 +91,11 @@ Chunk.prototype = {
     renderToMinimap: function(minimap, immediate){
         this.forEachCoord(function(i, j) {
             var tile = this._tiles[i][j];
+
+            if(!this.allowCaching){
+                this.game.isoProjector.saveTriangle(tile, tile.triangles[0]);
+                this.game.isoProjector.saveTriangle(tile, tile.triangles[1]);
+            }
 
             var triangle = tile.triangles[0];
             var shade = triangle.getShade(game.isoProjector.light);

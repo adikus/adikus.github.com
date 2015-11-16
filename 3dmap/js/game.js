@@ -1,4 +1,4 @@
-VERSION = '0.2.11';
+VERSION = '0.2.12';
 
 TILE_SIZE = 15;
 TILE_HEIGHT = 5;

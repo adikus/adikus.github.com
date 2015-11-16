@@ -138,7 +138,20 @@ IsoProjector.prototype = {
         graphics.endFill();
     },
 
-    draw: function(tile, graphics, isEdge) {
+    saveTriangle: function(tile, triangle) {
+        if(!this._initialized){
+            this._constructProjector();
+            this._initialized = true;
+        }
+
+        var offsetPoints = this._getOffsetPoints(tile, triangle);
+        var color = triangle.getColor(triangle.getShade(this.light));
+
+        triangle._projectedPoints = offsetPoints;
+        triangle._color = color;
+    },
+
+    draw: function(tile, graphics, isEdge, dirty) {
         if(!this._initialized){
             this._constructProjector();
             this._initialized = true;
@@ -147,8 +160,11 @@ IsoProjector.prototype = {
         var contourPoints = [];
 
         _(tile.triangles).each(function(triangle) {
-            var offsetPoints = this._getOffsetPoints(tile, triangle);
-            var color = triangle.getColor(triangle.getShade(this.light));
+            if(!triangle._projectedPoints || dirty){
+                this.saveTriangle(tile, triangle)
+            }
+            var offsetPoints = triangle._projectedPoints;
+            var color = triangle._color;
 
             graphics.lineStyle(2, color, 1);
             graphics.beginFill(color);
