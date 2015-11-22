@@ -165,6 +165,7 @@ IsoProjector.prototype = {
             }
             var offsetPoints = triangle._projectedPoints;
             var color = triangle._color;
+            triangle._projectedPoints = null;
 
             graphics.lineStyle(2, color, 1);
             graphics.beginFill(color);

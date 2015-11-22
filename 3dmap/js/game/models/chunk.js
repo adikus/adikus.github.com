@@ -83,6 +83,9 @@ Chunk.prototype = {
                 this._cache[index] = this._graphics;
                 this.cached = true;
             }
+
+            var graphics = this._graphics;
+            _.defer(function(){ graphics.graphicsData = []; });
         }
 
         this._dirty = false;
